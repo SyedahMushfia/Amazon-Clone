@@ -1,0 +1,62 @@
+type ImageGridProps = {
+  imageArray: { image: string; name?: string }[];
+};
+
+// This function creates a layout for a grid of images in the product card.
+function GridLayoutCard({ imageArray }: ImageGridProps) {
+  // Divide the array of 4 images into two rows
+  const splitIndex =
+    imageArray && imageArray.length === 4
+      ? Math.ceil(imageArray.length / 2)
+      : 0;
+  const firstRow = imageArray.slice(0, splitIndex);
+
+  const secondRow = imageArray.slice(splitIndex);
+
+  return (
+    <div className=" mt-[5%] mb-[7%] h-[23vw] ">
+      <div className=" w-full h-[36%] mb-[18%] flex gap-[6%]">
+        {/* This generates a row of images based on the 'firstRow' array. */}
+        {firstRow.map(
+          (imageData: { image: string; name?: string }, index: number) => (
+            <div
+              className="bg-green-300 h-full w-[50%] relative"
+              key={`firstRow_${index}`}
+            >
+              <img
+                src={imageData.image}
+                alt={imageData.name}
+                className="w-full h-full object-cover"
+              />
+              <span className="absolute top-[100%] font-sans text-clamp7">
+                {imageData.name}
+              </span>
+            </div>
+          )
+        )}
+      </div>
+      <div className=" w-full h-[36%] mb-[18%] flex gap-[6%]">
+        {/* This generates a row of images based on the 'secondRow' array. */}
+        {secondRow.map(
+          (imageData: { image: string; name?: string }, index: number) => (
+            <div
+              className="bg-green-300 h-full w-[50%] relative"
+              key={`secondRow_${index}`}
+            >
+              <img
+                src={imageData.image}
+                alt={imageData.name}
+                className="w-full h-full object-cover"
+              />
+              <span className="absolute top-[100%] font-sans text-clamp7">
+                {imageData.name}
+              </span>
+            </div>
+          )
+        )}
+      </div>
+    </div>
+  );
+}
+
+export default GridLayoutCard;
