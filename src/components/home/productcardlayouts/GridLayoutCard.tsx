@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 type ImageGridProps = {
   imageArray: { image: string; name?: string }[];
 };
@@ -19,19 +21,18 @@ function GridLayoutCard({ imageArray }: ImageGridProps) {
         {/* This generates a row of images based on the 'firstRow' array. */}
         {firstRow.map(
           (imageData: { image: string; name?: string }, index: number) => (
-            <div
-              className="bg-green-300 h-full w-[50%] relative"
-              key={`firstRow_${index}`}
-            >
-              <img
-                src={imageData.image}
-                alt={imageData.name}
-                className="w-full h-full object-cover"
-              />
-              <span className="absolute top-[100%] font-sans text-clamp7">
-                {imageData.name}
-              </span>
-            </div>
+            <Link to={`/productListing/${imageData.name}`}>
+              <div className="bg-green-300  relative" key={`firstRow_${index}`}>
+                <img
+                  src={imageData.image}
+                  alt={imageData.name}
+                  className="w-full h-full object-cover"
+                />
+                <span className="absolute top-[100%] font-sans text-clamp7">
+                  {imageData.name}
+                </span>
+              </div>
+            </Link>
           )
         )}
       </div>
@@ -39,19 +40,18 @@ function GridLayoutCard({ imageArray }: ImageGridProps) {
         {/* This generates a row of images based on the 'secondRow' array. */}
         {secondRow.map(
           (imageData: { image: string; name?: string }, index: number) => (
-            <div
-              className="bg-green-300 h-full w-[50%] relative"
-              key={`secondRow_${index}`}
-            >
-              <img
-                src={imageData.image}
-                alt={imageData.name}
-                className="w-full h-full object-cover"
-              />
-              <span className="absolute top-[100%] font-sans text-clamp7">
-                {imageData.name}
-              </span>
-            </div>
+            <Link to={`/productListing/${imageData.name}`}>
+              <div className="bg-green-300 relative" key={`secondRow_${index}`}>
+                <img
+                  src={imageData.image}
+                  alt={imageData.name}
+                  className="w-full h-full object-cover"
+                />
+                <span className="absolute top-[100%] font-sans text-clamp7">
+                  {imageData.name}
+                </span>
+              </div>
+            </Link>
           )
         )}
       </div>
