@@ -27,7 +27,7 @@ const gamingAccessoriesImages = [
   {
     image:
       "https://res.cloudinary.com/dvnfulvef/image/upload/v1716643859/product_card_images/Computer_mice_gmfiye.jpg",
-    name: "Computer mice ",
+    name: "Computer mice",
   },
   {
     image:
@@ -49,7 +49,7 @@ const fashion = [
   },
   {
     image:
-      "https://res.cloudinary.com/dvnfulvef/image/upload/v1716643857/product_card_images/Dresses_under_30_jpyqa2.jpg",
+      "https://res.cloudinary.com/dvnfulvef/image/upload/c_crop,w_121,h_114/v1718376823/product_card_images/dresses_under_30_cztd5n.jpg",
     name: "Dresses under $30",
   },
   {
@@ -72,12 +72,12 @@ const refreshYourSpace = [
   },
   {
     image:
-      "https://res.cloudinary.com/dvnfulvef/image/upload/v1716643858/product_card_images/Kitchen_m4qfvo.jpg",
+      "https://res.cloudinary.com/dvnfulvef/image/upload/c_crop,w_121,h_114/v1718377548/product_card_images/Kitchen_r2dzki.jpg",
     name: "Kitchen",
   },
   {
     image:
-      "https://res.cloudinary.com/dvnfulvef/image/upload/v1716643858/product_card_images/Health_and_Beauty_zmvpzc.jpg",
+      "https://res.cloudinary.com/dvnfulvef/image/upload/c_crop,w_121,h_114/v1716643858/product_card_images/Health_and_Beauty_zmvpzc.jpg",
     name: "Health and Beauty",
   },
 ];
@@ -155,7 +155,7 @@ const beautyProducts = [
   },
   {
     image:
-      "https://res.cloudinary.com/dvnfulvef/image/upload/v1716643835/product_card_images/Sponges_t8yplx.jpg",
+      "https://res.cloudinary.com/dvnfulvef/image/upload/c_crop,w_121,h_114/v1716643835/product_card_images/Sponges_t8yplx.jpg",
     name: "Sponges",
   },
   {
