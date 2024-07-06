@@ -1,8 +1,11 @@
-import { images } from "../../context/ImageStylingContext";
 import Carousel from "./Carousel";
 import Product from "./Product";
 
+import { useImageStylingContext } from "../../context/ImageStylingContext";
+
 function Home() {
+  const images = useImageStylingContext();
+
   return (
     <div>
       <Carousel />
