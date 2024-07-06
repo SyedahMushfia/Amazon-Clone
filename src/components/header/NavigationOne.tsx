@@ -1,5 +1,6 @@
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import SearchIcon from "@mui/icons-material/Search";
+import { Link } from "react-router-dom";
 
 function NavigationOne() {
   return (
@@ -7,13 +8,17 @@ function NavigationOne() {
       <div className="bg-gray-900 h-[4.5vw] flex content-center justify-evenly w-full">
         <div className="w-[11%] flex flex-[1_1_11%] justify-evenly min-w-0 items-center ">
           {/* logo */}
+
           <div className="w-[40%] pl-[1%] ml-[3%] pt-[2%] min-w-[40%]">
-            <img src="src/images/Amazon-logo.png" alt="amazon-logo" />
+            <Link to="/">
+              <img src="/images/Amazon-logo.png" alt="amazon-logo" />
+            </Link>
           </div>
+
           {/* location */}
           <div className=" flex font-sans items-center w-[43%] min-w-[43%] ml-[5%]">
             <div className="w-[19%] min-w-[22%] mt-[9%] -mr-[1%]">
-              <img src="src/images/location-icon.png" alt="location-icon" />
+              <img src="/images/location-icon.png" alt="location-icon" />
             </div>
             <div>
               <span className="mt-[2%] text-clamp1 block  text-zinc-300 font-medium tracking-wide">
@@ -56,12 +61,12 @@ function NavigationOne() {
           </div>
         </div>
 
-        <div className="flex justify-evenly w-[22%] flex-[1_1_22%] min-w-0 items-center">
+        <div className="flex justify-evenly w-[22%] flex-[1_1_22%]  items-center">
           {/* language */}
           <div className="flex w-[16%] ml-[5%] mt-[3%]">
             <div className="w-[30%] h-[6%] mt-[10%]">
               <img
-                src="src/images/flag-icon.png"
+                src="/images/flag-icon.png"
                 alt="flag-icon"
                 className="w-full h-full object-cover"
               />
@@ -104,19 +109,23 @@ function NavigationOne() {
             </span>
           </div>
           {/* cart */}
-          <div className="flex w-[23%] h-[60%] -ml-[3%]">
-            <span className="text-orange-400 font-sans font-bold text-clamp4 ml-[32%]">
-              0
-            </span>
-            <img
-              src="src/images/cart-icon.png"
-              alt="cart-icon"
-              className="w-[45%] h-[100%] -ml-[32%]"
-            />
-            <span className="text-white font-sans font-bold text-clamp2 mt-[15%]">
-              Cart
-            </span>
-          </div>
+          <Link to="/checkout">
+            <div className="flex w-[90%] py-[5%] justify-center items-center">
+              <span className="text-orange-400 font-sans font-bold text-clamp4 -mr-[30%] -mt-[15%]">
+                0
+              </span>
+
+              <img
+                src="/images/cart-icon.png"
+                alt="cart-icon"
+                className="w-[43%]"
+              />
+
+              <span className="text-white font-sans font-bold text-clamp2 mt-[15%]">
+                Cart
+              </span>
+            </div>
+          </Link>
         </div>
       </div>
     </>
