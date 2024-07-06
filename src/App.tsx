@@ -3,7 +3,7 @@ import { createBrowserRouter, Outlet, RouterProvider } from "react-router-dom";
 import { ImageStylingContext, images } from "./context/ImageStylingContext";
 import CheckoutPage from "./components/checkoutPage/CheckoutPage";
 import NotFoundPage from "./components/NotFoundPage";
-import ProductListing from "./components/productsPage/productListingPage/ProductListing";
+import ProductListing from "./components/productsPages/productListingPage/ProductListing";
 import Header from "./components/header/Header";
 import { lazy, Suspense } from "react";
 const SignIn = lazy(() => import("./components/home/SignIn"));
