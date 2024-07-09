@@ -130,8 +130,10 @@ function Sidebar(props: SidebarProps) {
                           {subCategoryKey}
                         </h3>
                         <div className="flex items-center mb-[5%]">
-                          <StarRating rating={4} />
-                          <span className="text-clamp3 -ml-[4%] hover:cursor-pointer hover:text-amber-500">
+                          <div className="-mt-[2%] -ml-[1%]">
+                            <StarRating rating={4} />
+                          </div>
+                          <span className="text-clamp3 hover:cursor-pointer hover:text-amber-500">
                             & Up
                           </span>
                         </div>
