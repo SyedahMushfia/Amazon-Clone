@@ -22,7 +22,10 @@ function GridLayoutCard({ imageArray }: ImageGridProps) {
         {firstRow.map(
           (imageData: { image: string; name?: string }, index: number) => (
             <Link to={`/productListing/${imageData.name}`}>
-              <div className="bg-green-300  relative" key={`firstRow_${index}`}>
+              <div
+                className="bg-green-300  relative"
+                key={`firstRow_${imageData.name}`}
+              >
                 <img
                   src={imageData.image}
                   alt={imageData.name}
@@ -41,7 +44,10 @@ function GridLayoutCard({ imageArray }: ImageGridProps) {
         {secondRow.map(
           (imageData: { image: string; name?: string }, index: number) => (
             <Link to={`/productListing/${imageData.name}`}>
-              <div className="bg-green-300 relative" key={`secondRow_${index}`}>
+              <div
+                className="bg-green-300 relative"
+                key={`secondRow_${imageData.name}`}
+              >
                 <img
                   src={imageData.image}
                   alt={imageData.name}
