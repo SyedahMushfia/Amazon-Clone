@@ -31,9 +31,13 @@ function ProductListing() {
           )}
         </div>
         {/* Product listing results section */}
-        <div className="bg-white w-[80%]">
-          <ProductListingResults />
-        </div>
+        {/* <div className="bg-white w-[80%]">
+          {id ? (
+            <ProductListingResults id={id} />
+          ) : (
+            <div>Error: Products results are missing or invalid</div>
+          )}
+        </div> */}
       </div>
     </>
   );

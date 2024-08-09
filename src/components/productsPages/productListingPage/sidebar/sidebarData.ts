@@ -116,10 +116,10 @@ export const sidebarData: SidebarDataObject = {
   },
   "Computer mice": {
     "Popular Shopping Ideas": [
-      "Wireless",
       "Ergonomic Design",
       "Lightweight",
       "Honeycomb",
+      "Wireless",
       "Rechargeable",
       "Soundless",
     ],
