@@ -11,12 +11,13 @@ interface IdProp {
   id: string | undefined;
 }
 
+interface SidebarDataDetails {
+  [key: string]: string[];
+}
+
 interface SidebarData {
-  category: string;
-  data: {
-    id: string;
-    items: string[];
-  }[];
+  id: string;
+  data: SidebarDataDetails[];
 }
 
 function Sidebar(props: IdProp) {
@@ -45,16 +46,15 @@ function Sidebar(props: IdProp) {
           );
           const sidebardataSnapshot = await getDocs(sidebardataRef);
 
-          const data = sidebardataSnapshot.docs.map((doc) => {
-            const docData = doc.data();
-            console.log(`Document ID: ${doc.id}, Data:`, docData); // Debugging log
-            return {
-              id: doc.id,
-              items: docData.items || [], // Ensure items is an array, even if it's missing
-            };
+          const data: SidebarDataDetails[] = sidebardataSnapshot.docs.map((doc) => {
+            return doc.data() as SidebarDataDetails;
+            // return {
+            //   id: doc.id,
+            //   items: docData.items || [], // Ensure items is an array, even if it's missing
+            // };
           });
 
-          allSidebarData.push({ category, data });
+          allSidebarData.push({ id: category, data });
         }
 
         console.log("Fetched sidebar data:", allSidebarData); // Debugging log
@@ -70,23 +70,22 @@ function Sidebar(props: IdProp) {
 
   return (
     <>
-      <div>
-        {sidebarData.map(({ category, data }) => {
-          if (category === props.id) {
-            return (
-              <div key={category}>
-                {data.map((doc) => {
-                  switch (doc.id) {
-                    case "Popular Shopping Ideas":
-                      return (
-                        <>
-                          <div key={doc.id}>
-                            <h3>{doc.id}</h3>
-                            {doc.items.length > 4 ? (
+    <div>{sidebarData.map((category) => {
+      if (category.id === props.id) {
+        return (
+          <div key={category.id}>
+            <ul>{category.data.map((doc, index) => (
+              <li key={`${category.id}-${index}`}>{Object.entries(doc).map(([key, values]) => {
+                switch (key) {
+                  case "Popular Shopping Ideas":
+                    return (
+                      <div key={key}>
+                        <h3>{key}</h3>
+                        {values.length > 4 ? (
                               seeMorePopular ? (
                                 <ul>
-                                  {doc.items.slice(0, 4).map((item, index) => (
-                                    <li key={`Sliced-array-${index}`}>
+                                  {values.slice(0, 4).map((item, index) => (
+                                    <li key={`Sliced-array-${item}-${index}`}>
                                       {item}
                                     </li>
                                   ))}
@@ -109,8 +108,8 @@ function Sidebar(props: IdProp) {
                                 </ul>
                               ) : (
                                 <ul>
-                                  {doc.items.map((item, index) => (
-                                    <li key={`Full-array-${index}`}>{item}</li>
+                                  {values.map((item, index) => (
+                                    <li key={`Full-array-${item}-${index}`}>{item}</li>
                                   ))}
                                   <div className="flex items-center mb-[5%] -ml-[2%]">
                                     <KeyboardArrowUpIcon
@@ -132,21 +131,144 @@ function Sidebar(props: IdProp) {
                               )
                             ) : (
                               <ul>
-                                {doc.items.map((item, index) => (
-                                  <li key={index}>{item}</li>
+                                {values.map((item, index) => (
+                                  <li key={`${item}-&-${index}`}>{item}</li>
                                 ))}
                               </ul>
                             )}
-                          </div>
-                        </>
-                      );
-                  }
-                })}
-              </div>
-            );
-          }
-        })}
-      </div>
+                      </div>
+                    )
+                    case "Department":
+                                 return (
+                                       <div key={key}>
+                                         <h3 className="font-bold text-clamp12 tracking-wide mb-[2%]">
+                                             {key}
+                                           </h3>
+                                           <ul className="text-clamp13 mb-[5%] leading-5">
+                                             {values.map(
+                                               (item, index) => (
+                                                 <li key={`${item}-${index}`}>
+                                                   {item}
+                                                 </li>
+                                               )
+                                             )}
+                                           </ul>
+                                         </div>
+                                       ); 
+                   case "Customer Review":
+                                                        return (
+                                                          <div key={key}>
+                                                            <h3 className="font-bold text-clamp12 tracking-wide mb-[2%]">
+                                                              {key}
+                                                            </h3>
+                                                            <div className="flex items-center mb-[5%]">
+                                                              <div className="-mt-[2%] -ml-[1%]">
+                                                                <StarRating
+                                                                  rating={values}
+                                                                  fontSize="clamp(0.5625rem, 0.1884rem + 1.5962vi, 1.625rem)"
+                                                                />
+                                                              </div>
+                                                              <span className="text-clamp3 hover:cursor-pointer hover:text-amber-500 -ml-[6%] -mt-[2%]">
+                                                                & Up
+                                                              </span>
+                                                            </div>
+                                                          </div>
+                                                        );
+                                                        case "Brands":
+                                                                          return (
+                                                                            <div key={key}>
+                                                                              <h3 className="font-bold text-clamp12 tracking-wide mb-[2%]">
+                                                                                {key}
+                                                                              </h3>
+                                                                              {values.length > 7 &&
+                                                                              seeMoreBrands ? (
+                                                                                <ul className="text-clamp13 -ml-[1.5%] leading-5">
+                                                                                  {values
+                                                                                    .slice(0, 7)
+                                                                                    .map((item, index) => (
+                                                                                      <li
+                                                                                        key={`Sliced-array-${item}-${index}`}
+                                                                                        className="flex items-center"
+                                                                                      >
+                                                                                        <input
+                                                                                          type="checkbox"
+                                                                                          id={values[index]}
+                                                                                          name={values[index]}
+                                                                                          className="w-[10%] h-4"
+                                                                                        />
+                                                                                        <label htmlFor={values[index]}>
+                                                                                          {values[index]}
+                                                                                        </label>
+                                                                                      </li>
+                                                                                    ))}
+                                                                                  <div className="flex items-center mb-[5%]">
+                                                                                    <KeyboardArrowDownIcon
+                                                                                      style={{
+                                                                                        fontSize:
+                                                                                          "clamp(0.5625rem, 0.1884rem + 1.5962vi, 1.625rem)",
+                                                                                      }}
+                                                                                    />
+                                                                                    <p
+                                                                                      onClick={() => {
+                                                                                        setIsSeeMoreBrands(!seeMoreBrands);
+                                                                                      }}
+                                                                                      className="text-cyan-700 hover:cursor-pointer hover:text-amber-500"
+                                                                                    >
+                                                                                      See more
+                                                                                    </p>
+                                                                                  </div>
+                                                                                </ul>
+                                                                              ) : (
+                                                                                <ul className="text-clamp13 -ml-[1.5%] leading-5">
+                                                                                  {values.map(
+                                                                                    (item, index) => (
+                                                                                      <li
+                                                                                        key={`Full-array-${item}-${index}`}
+                                                                                        className="flex items-center"
+                                                                                      >
+                                                                                        <input
+                                                                                          type="checkbox"
+                                                                                          id={values[index]}
+                                                                                          name={values[index]}
+                                                                                          className="w-[10%] h-4"
+                                                                                        />
+                                                                                        <label htmlFor={values[index]}>
+                                                                                          {values[index]}
+                                                                                        </label>
+                                                                                      </li>
+                                                                                    )
+                                                                                  )}
+                                                                                  <div className="flex items-center mb-[5%]">
+                                                                                    <KeyboardArrowUpIcon
+                                                                                      style={{
+                                                                                        fontSize:
+                                                                                          "clamp(0.5625rem, 0.1884rem + 1.5962vi, 1.625rem)",
+                                                                                      }}
+                                                                                    />
+                                                                                    <p
+                                                                                      onClick={() => {
+                                                                                        setIsSeeMoreBrands(!seeMoreBrands);
+                                                                                      }}
+                                                                                      className="text-cyan-700 hover:cursor-pointer hover:text-amber-500"
+                                                                                    >
+                                                                                      See less
+                                                                                    </p>
+                                                                                  </div>
+                                                                                </ul>
+                                                                              )}
+                                                                            </div>
+                                                                          );
+                  
+                }
+               
+                
+    })}</li>
+            ))}</ul>
+          </div>
+        )
+      }
+    })}</div>
+   
     </>
     // <>
     //   {Object.keys(sidebarData).map((categoryKey) => {

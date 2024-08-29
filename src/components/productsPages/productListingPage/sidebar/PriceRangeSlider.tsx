@@ -6,6 +6,7 @@ function valuetext(value: number) {
   return `$${value}`;
 }
 
+
 function PriceRangeSlider() {
   const [value, setValue] = useState<number[]>([1, 550]);
 

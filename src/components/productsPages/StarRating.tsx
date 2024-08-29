@@ -3,7 +3,7 @@ import StarBorderIcon from "@mui/icons-material/StarBorder";
 import StarHalfIcon from "@mui/icons-material/StarHalf";
 
 interface StarRatingProps {
-  rating: number; // The rating value to display
+  rating: number | string[]; // The rating value to display
   totalStars?: number; // Optional prop for the total number of stars
   fontSize: string; // The size of the star icons
 }
@@ -18,7 +18,7 @@ function StarRating(props: StarRatingProps) {
     let star: React.ReactElement;
 
     // Conditionally render full, half, or empty star icons
-    if (rating - i > 0 && rating - i < 1) {
+    if (typeof rating === 'number' && rating - i > 0 && rating - i < 1) {
       star = (
         <StarHalfIcon
           key={i}
@@ -26,7 +26,7 @@ function StarRating(props: StarRatingProps) {
           className="text-amber-500 hover:cursor-pointer -mr-[3%]"
         />
       );
-    } else if (i < rating) {
+    } else if (typeof rating === 'number' && i < rating) {
       star = (
         <StarIcon
           key={i}
