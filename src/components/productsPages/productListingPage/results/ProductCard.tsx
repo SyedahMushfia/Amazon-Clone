@@ -34,7 +34,7 @@ function ProductCard(props: ProductListProps) {
         if (product.id === props.id) {
           return product.data.map((details) => (
             <div
-              key={product.id}
+              key={details.name}
               className="mr-[1%] mb-[1%] flex border-[1px] border-gray-100 rounded-[6px]"
             >
               <div
@@ -55,7 +55,7 @@ function ProductCard(props: ProductListProps) {
               </div>
               <div className="bg-white w-[75%] rounded-r-[4px] pl-[1.5%]">
                 <Link to="">
-                  <h1 className="text-clamp15 my-[0.75%] line-clamp-2">
+                  <h1 className="text-clamp17 my-[0.75%] line-clamp-2">
                     {details.name}
                   </h1>
                 </Link>
