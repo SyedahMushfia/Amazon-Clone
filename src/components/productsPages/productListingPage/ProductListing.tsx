@@ -2,14 +2,59 @@ import { useParams, Navigate } from "react-router-dom";
 import Sidebar from "./sidebar/Sidebar";
 import DropdownButton from "./DropdownButton";
 import ProductListingResults from "./results/ProductListingResults";
+import { useProductDetails, useSidebarData } from "../dataFetchingHooks";
+import { useEffect, useState } from "react";
+import { Data, ProductDetails } from "../../../interfaces";
 
 function ProductListing() {
   const { id } = useParams<{ id: string }>();
+  // Fetch product details
+  const { productDetails, allProducts } = useProductDetails();
+
+  // Fetch sidebar data
+  const { sidebarData } = useSidebarData();
+
+  // State to manage the list of filtered products based on selected brands
+  const [filteredProducts, setFilteredProducts] = useState<ProductDetails[]>(
+    []
+  );
+
+  // State to manage the selected brands from the BrandsFilter component
+  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
 
   // Redirect to NotFoundPage if 'id' parameter is missing
   if (!id) {
     return <Navigate to="/notFoundPage" />;
   }
+
+  // Find the matching product and sidebar data based on the 'id' parameter
+  const matchedCategory = {
+    product: allProducts.find((product) => product.id === id),
+    sidebarData: sidebarData.find((sidebar) => sidebar.id === id),
+  };
+
+  useEffect(() => {
+    if (matchedCategory.product) {
+      // Initially, all products are displayed before any filters are applied
+      setFilteredProducts(matchedCategory.product.data);
+    }
+  }, [matchedCategory.product]);
+
+  // Function to handle changes in the selected brands from the BrandsFilter component
+  const handleBrandFilterChange = (selectedBrands: string[]) => {
+    setSelectedBrands(selectedBrands);
+
+    // If there is a matched product category, filter the products based on the selected brands
+    if (matchedCategory.product) {
+      const filtered =
+        selectedBrands.length === 0
+          ? matchedCategory.product?.data // If no brands are selected, show all products
+          : matchedCategory.product?.data.filter(
+              (detail) => selectedBrands.includes(detail.brand) // Filter products that match the selected brands
+            );
+      setFilteredProducts(filtered); // Update the state with the filtered products
+    }
+  };
 
   return (
     <>
@@ -24,16 +69,22 @@ function ProductListing() {
       </div>
       <div className="flex gap-[1.75%] bg-white pt-[1.5%]">
         <div className=" w-[20%] bg-white ml-[1%]">
-          {id ? (
-            <Sidebar id={id} /> // Display Sidebar based on 'id' parameter
+          {matchedCategory ? (
+            <Sidebar
+              sidebarData={matchedCategory.sidebarData} // Pass the relevant sidebar data for the category
+              onBrandFilterChange={handleBrandFilterChange} // Handle brand filter changes from the Sidebar
+            />
           ) : (
             <div>Error: Sidebar data is missing or invalid.</div>
           )}
         </div>
         {/* Product listing results section */}
         <div className="bg-white w-[80%]">
-          {id ? (
-            <ProductListingResults id={id} />
+          {matchedCategory ? (
+            <ProductListingResults
+              allProducts={filteredProducts} // Display the product list
+              matchedCategory={matchedCategory.product}
+            />
           ) : (
             <div>Error: Products results are missing or invalid</div>
           )}
