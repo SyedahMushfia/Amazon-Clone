@@ -1,7 +1,9 @@
 import ProductCard from "./ProductCard";
+import { ProductDetails, Data } from "../../../../interfaces";
 
 interface ProductListProps {
-  id: string | undefined;
+  allProducts: ProductDetails[]; // Array of product details to display
+  matchedCategory: Data | undefined; // Data of the matched product category
 }
 
 function ProductListingResults(props: ProductListProps) {
@@ -15,7 +17,10 @@ function ProductListingResults(props: ProductListProps) {
           </p>
         </div>
         <div>
-          <ProductCard id={props.id} />
+          <ProductCard
+            allProducts={props.allProducts} // Pass the filtered or full list of products to the ProductCard component
+            matchedCategory={props.matchedCategory}
+          />
         </div>
       </div>
     </>
