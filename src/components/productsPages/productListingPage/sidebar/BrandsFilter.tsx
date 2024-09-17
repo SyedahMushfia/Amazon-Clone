@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
@@ -15,6 +15,15 @@ function BrandsFilter(props: BrandsFilterProps) {
   // State to keep track of the selected brands for filtering
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
 
+  useEffect(() => {
+    const storedSelectedBrands = localStorage.getItem("selectedBrands");
+    if (storedSelectedBrands) {
+      const parsedBrands = JSON.parse(storedSelectedBrands);
+      setSelectedBrands(parsedBrands);
+      props.onBrandFilterChange(parsedBrands); // Update the parent component with stored brands
+    }
+  }, []);
+
   // Handle changes when a checkbox is checked or unchecked
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // If the checkbox is checked, add the brand to the selectedBrands array
@@ -25,6 +34,10 @@ function BrandsFilter(props: BrandsFilterProps) {
 
     // Update local selectedBrands state
     setSelectedBrands(updatedSelectedBrands);
+    localStorage.setItem(
+      "selectedBrands",
+      JSON.stringify(updatedSelectedBrands)
+    );
 
     // Pass updated selected brands to the sidebar's handleBrandFilterChange function as an argument
     props.onBrandFilterChange(updatedSelectedBrands);
@@ -41,6 +54,7 @@ function BrandsFilter(props: BrandsFilterProps) {
               onClick={() => {
                 setSelectedBrands([]); // Clear local selected brands state
                 props.onBrandFilterChange([]); // Notify parent component to clear selected filters
+                localStorage.removeItem("selectedBrands");
               }}
               className="text-clamp10 cursor-pointer -ml-[2%] mt-[0.5%]"
             >
