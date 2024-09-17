@@ -20,7 +20,9 @@ function ProductListing() {
   );
 
   // State to manage the selected brands from the BrandsFilter component
-  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
+  const [selectedBrands, setSelectedBrands] = useState<string[]>(
+    JSON.parse(localStorage.getItem("selectedBrands") || "[]")
+  );
 
   // Redirect to NotFoundPage if 'id' parameter is missing
   if (!id) {
@@ -34,7 +36,12 @@ function ProductListing() {
   };
 
   useEffect(() => {
-    if (matchedCategory.product) {
+    const savedFilteredProducts = JSON.parse(
+      localStorage.getItem("filteredProducts") || "[]"
+    );
+    if (savedFilteredProducts.length > 0) {
+      setFilteredProducts(savedFilteredProducts);
+    } else if (matchedCategory.product) {
       // Initially, all products are displayed before any filters are applied
       setFilteredProducts(matchedCategory.product.data);
     }
@@ -43,6 +50,7 @@ function ProductListing() {
   // Function to handle changes in the selected brands from the BrandsFilter component
   const handleBrandFilterChange = (selectedBrands: string[]) => {
     setSelectedBrands(selectedBrands);
+    localStorage.setItem("selectedBrands", JSON.stringify(selectedBrands));
 
     // If there is a matched product category, filter the products based on the selected brands
     if (matchedCategory.product) {
@@ -53,6 +61,7 @@ function ProductListing() {
               (detail) => selectedBrands.includes(detail.brand) // Filter products that match the selected brands
             );
       setFilteredProducts(filtered); // Update the state with the filtered products
+      localStorage.setItem("filteredProducts", JSON.stringify(filtered));
     }
   };
 
