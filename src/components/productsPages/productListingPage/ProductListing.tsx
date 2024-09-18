@@ -20,9 +20,10 @@ function ProductListing() {
   );
 
   // State to manage the selected brands from the BrandsFilter component
-  const [selectedBrands, setSelectedBrands] = useState<string[]>(
-    JSON.parse(localStorage.getItem("selectedBrands") || "[]")
-  );
+  const [selectedBrands, setSelectedBrands] = useState<string[]>(() => {
+    const savedSelectedBrands = localStorage.getItem(`selectedBrands-${id}`);
+    return savedSelectedBrands ? JSON.parse(savedSelectedBrands) : [];
+  });
 
   // Redirect to NotFoundPage if 'id' parameter is missing
   if (!id) {
@@ -36,21 +37,29 @@ function ProductListing() {
   };
 
   useEffect(() => {
-    const savedFilteredProducts = JSON.parse(
-      localStorage.getItem("filteredProducts") || "[]"
-    );
-    if (savedFilteredProducts.length > 0) {
-      setFilteredProducts(savedFilteredProducts);
-    } else if (matchedCategory.product) {
-      // Initially, all products are displayed before any filters are applied
-      setFilteredProducts(matchedCategory.product.data);
+    if (matchedCategory.product) {
+      const savedBrands = localStorage.getItem(`selectedBrands-${id}`);
+      const savedProducts = localStorage.getItem(`filteredProducts-${id}`);
+
+      if (savedBrands) {
+        const parsedBrands = JSON.parse(savedBrands);
+        setSelectedBrands(parsedBrands);
+        console.log(`Got ${parsedBrands} after refresh`); // Log the parsed brands
+      }
+
+      if (savedProducts) {
+        const parsedProducts = JSON.parse(savedProducts);
+        setFilteredProducts(parsedProducts);
+        console.log(`Got ${parsedProducts} after refresh`); // Log the parsed products
+      } else {
+        setFilteredProducts(matchedCategory.product.data); // Set default data
+      }
     }
-  }, [matchedCategory.product]);
+  }, [matchedCategory.product, id]);
 
   // Function to handle changes in the selected brands from the BrandsFilter component
   const handleBrandFilterChange = (selectedBrands: string[]) => {
     setSelectedBrands(selectedBrands);
-    localStorage.setItem("selectedBrands", JSON.stringify(selectedBrands));
 
     // If there is a matched product category, filter the products based on the selected brands
     if (matchedCategory.product) {
@@ -61,7 +70,19 @@ function ProductListing() {
               (detail) => selectedBrands.includes(detail.brand) // Filter products that match the selected brands
             );
       setFilteredProducts(filtered); // Update the state with the filtered products
-      localStorage.setItem("filteredProducts", JSON.stringify(filtered));
+      console.log(`Filtered products ${filteredProducts}`);
+
+      localStorage.setItem(
+        `selectedBrands-${id}`,
+        JSON.stringify(selectedBrands)
+      );
+      console.log(
+        `Saved ${selectedBrands} to localStorage in ProductListing.tsx`
+      );
+      localStorage.setItem(`filteredProducts-${id}`, JSON.stringify(filtered));
+      console.log(
+        `Saved ${filteredProducts} to localStorage in ProductListing.tsx`
+      );
     }
   };
 
@@ -80,6 +101,7 @@ function ProductListing() {
         <div className=" w-[20%] bg-white ml-[1%]">
           {matchedCategory ? (
             <Sidebar
+              id={id}
               sidebarData={matchedCategory.sidebarData} // Pass the relevant sidebar data for the category
               onBrandFilterChange={handleBrandFilterChange} // Handle brand filter changes from the Sidebar
             />
@@ -102,5 +124,4 @@ function ProductListing() {
     </>
   );
 }
-
 export default ProductListing;
