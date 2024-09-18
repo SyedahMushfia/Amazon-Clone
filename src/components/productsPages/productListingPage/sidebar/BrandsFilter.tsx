@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 
 interface BrandsFilterProps {
+  id: string;
   brands: string[]; // Array of available brand names
   onBrandFilterChange: (selectedBrands: string[]) => void; // Callback function to handle changes in selected brands
 }
@@ -13,16 +14,14 @@ function BrandsFilter(props: BrandsFilterProps) {
   const [seeMoreBrands, setIsSeeMoreBrands] = useState(true);
 
   // State to keep track of the selected brands for filtering
-  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
+  const [selectedBrands, setSelectedBrands] = useState<string[]>(() => {
+    const savedSelectedBrands = localStorage.getItem(
+      `selectedBrands-${props.id}`
+    );
+    return savedSelectedBrands ? JSON.parse(savedSelectedBrands) : [];
+  });
 
-  useEffect(() => {
-    const storedSelectedBrands = localStorage.getItem("selectedBrands");
-    if (storedSelectedBrands) {
-      const parsedBrands = JSON.parse(storedSelectedBrands);
-      setSelectedBrands(parsedBrands);
-      props.onBrandFilterChange(parsedBrands); // Update the parent component with stored brands
-    }
-  }, []);
+  console.log(`Recieved ${selectedBrands} from localStorage`);
 
   // Handle changes when a checkbox is checked or unchecked
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,10 +34,10 @@ function BrandsFilter(props: BrandsFilterProps) {
     // Update local selectedBrands state
     setSelectedBrands(updatedSelectedBrands);
     localStorage.setItem(
-      "selectedBrands",
+      `updatedSelectedBrands-${props.id}`,
       JSON.stringify(updatedSelectedBrands)
     );
-
+    console.log(`Saved ${updatedSelectedBrands} to localStorage`);
     // Pass updated selected brands to the sidebar's handleBrandFilterChange function as an argument
     props.onBrandFilterChange(updatedSelectedBrands);
   };
@@ -54,7 +53,7 @@ function BrandsFilter(props: BrandsFilterProps) {
               onClick={() => {
                 setSelectedBrands([]); // Clear local selected brands state
                 props.onBrandFilterChange([]); // Notify parent component to clear selected filters
-                localStorage.removeItem("selectedBrands");
+                localStorage.removeItem(`selectedBrands-${props.id}`);
               }}
               className="text-clamp10 cursor-pointer -ml-[2%] mt-[0.5%]"
             >
