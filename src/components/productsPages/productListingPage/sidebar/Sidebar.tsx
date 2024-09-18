@@ -7,6 +7,7 @@ import BrandsFilter from "./BrandsFilter";
 import { SidebarData } from "../../../../interfaces";
 
 interface SidebarProps {
+  id: string;
   sidebarData: SidebarData | undefined;
   onBrandFilterChange: (selectedBrands: string[]) => void;
 }
@@ -159,6 +160,7 @@ function Sidebar(props: SidebarProps) {
                               </h3>
 
                               <BrandsFilter
+                                id={props.id}
                                 brands={values}
                                 onBrandFilterChange={handleBrandFilterChange}
                               />
