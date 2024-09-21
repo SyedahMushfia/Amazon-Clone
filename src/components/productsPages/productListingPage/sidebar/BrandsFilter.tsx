@@ -23,10 +23,6 @@ function BrandsFilter(props: BrandsFilterProps) {
     return getFromLocalStorage(`selectedBrands-${props.id}`) || [];
   });
 
-  // const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
-
-  console.log(`Recieved ${selectedBrands} from localStorage`);
-
   // Handle changes when a checkbox is checked or unchecked
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     // If the checkbox is checked, add the brand to the selectedBrands array
@@ -41,7 +37,6 @@ function BrandsFilter(props: BrandsFilterProps) {
       `updatedSelectedBrands-${props.id}`,
       updatedSelectedBrands
     );
-    console.log(`Saved ${updatedSelectedBrands} to localStorage`);
     // Pass updated selected brands to the sidebar's handleBrandFilterChange function as an argument
     props.onBrandFilterChange(updatedSelectedBrands);
   };
