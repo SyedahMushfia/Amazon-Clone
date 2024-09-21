@@ -10,6 +10,7 @@ interface SidebarProps {
   id: string;
   sidebarData: SidebarData | undefined;
   onBrandFilterChange: (selectedBrands: string[]) => void;
+  onPriceFilterChange: (minPrice: number, maxPrice: number) => void;
 }
 
 function Sidebar(props: SidebarProps) {
@@ -20,10 +21,18 @@ function Sidebar(props: SidebarProps) {
   // Manage the selected brands recieved from the BrandsFilter component
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
 
+  const [priceRange, setPriceRange] = useState<number[]>([0, 550]);
+
   // Update the selected brands state and notify the parent component about the changes
   const handleBrandFilterChange = (newSelectedBrands: string[]) => {
     setSelectedBrands(newSelectedBrands); // Update local selected brands state
     props.onBrandFilterChange(newSelectedBrands); // Send selected brands to ProductListing for filtering logic
+  };
+
+  // Update the selected prince range state and notify the parent component about the changes
+  const handlePriceFilterChange = (minPrice: number, maxPrice: number) => {
+    setPriceRange([minPrice, maxPrice]);
+    props.onPriceFilterChange(minPrice, maxPrice);
   };
 
   return (
@@ -174,8 +183,10 @@ function Sidebar(props: SidebarProps) {
                               </h3>
                               <div className="mb-[5%]">
                                 <PriceRangeSlider
+                                  id={props.id}
                                   min={values[0]}
                                   max={values[1]}
+                                  onPriceChange={handlePriceFilterChange}
                                 />
                               </div>
                             </div>
