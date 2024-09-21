@@ -14,6 +14,7 @@ import { ProductDetails, Data } from "../../../../interfaces";
 interface ProductListProps {
   allProducts: ProductDetails[]; // Array of product details to display
   matchedCategory: Data | undefined; // Data of the matched product category
+  isStarInteractive: boolean;
 }
 
 function ProductCard(props: ProductListProps) {
@@ -54,6 +55,7 @@ function ProductCard(props: ProductListProps) {
                 <StarRating
                   rating={details.rating}
                   fontSize="clamp(0.5625rem, 0.2984rem + 1.1268vi, 1.3125rem)"
+                  isStarInteractive={false}
                 />
                 <KeyboardArrowDownIcon
                   style={{
