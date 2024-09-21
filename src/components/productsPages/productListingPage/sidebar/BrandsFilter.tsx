@@ -2,6 +2,11 @@ import { useEffect, useState } from "react";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
+import {
+  getFromLocalStorage,
+  saveToLocalStorage,
+  removeFromLocalStorage,
+} from "../../../../utils";
 
 interface BrandsFilterProps {
   id: string;
@@ -15,11 +20,10 @@ function BrandsFilter(props: BrandsFilterProps) {
 
   // State to keep track of the selected brands for filtering
   const [selectedBrands, setSelectedBrands] = useState<string[]>(() => {
-    const savedSelectedBrands = localStorage.getItem(
-      `selectedBrands-${props.id}`
-    );
-    return savedSelectedBrands ? JSON.parse(savedSelectedBrands) : [];
+    return getFromLocalStorage(`selectedBrands-${props.id}`) || [];
   });
+
+  // const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
 
   console.log(`Recieved ${selectedBrands} from localStorage`);
 
@@ -33,9 +37,9 @@ function BrandsFilter(props: BrandsFilterProps) {
 
     // Update local selectedBrands state
     setSelectedBrands(updatedSelectedBrands);
-    localStorage.setItem(
+    saveToLocalStorage(
       `updatedSelectedBrands-${props.id}`,
-      JSON.stringify(updatedSelectedBrands)
+      updatedSelectedBrands
     );
     console.log(`Saved ${updatedSelectedBrands} to localStorage`);
     // Pass updated selected brands to the sidebar's handleBrandFilterChange function as an argument
@@ -53,7 +57,7 @@ function BrandsFilter(props: BrandsFilterProps) {
               onClick={() => {
                 setSelectedBrands([]); // Clear local selected brands state
                 props.onBrandFilterChange([]); // Notify parent component to clear selected filters
-                localStorage.removeItem(`selectedBrands-${props.id}`);
+                removeFromLocalStorage(`updatedSelectedBrands-${props.id}`);
               }}
               className="text-clamp10 cursor-pointer -ml-[2%] mt-[0.5%]"
             >
