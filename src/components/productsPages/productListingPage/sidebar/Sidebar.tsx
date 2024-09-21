@@ -11,6 +11,8 @@ interface SidebarProps {
   sidebarData: SidebarData | undefined;
   onBrandFilterChange: (selectedBrands: string[]) => void;
   onPriceFilterChange: (minPrice: number, maxPrice: number) => void;
+  onRatingsFilterChange: (ratings: number) => void;
+  isStarInteractive: boolean;
 }
 
 function Sidebar(props: SidebarProps) {
@@ -18,10 +20,12 @@ function Sidebar(props: SidebarProps) {
   const [seeMorePopular, setIsSeeMorePopular] = useState(true);
   const [seeMoreSeller, setIsSeeMoreSeller] = useState(true);
 
-  // Manage the selected brands recieved from the BrandsFilter component
+  // Manage the selected brands, price range and ratings recieved from the BrandsFilter component
   const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
 
   const [priceRange, setPriceRange] = useState<number[]>([0, 550]);
+
+  const [selectedRatings, setSelectedRatings] = useState<number>(4);
 
   // Update the selected brands state and notify the parent component about the changes
   const handleBrandFilterChange = (newSelectedBrands: string[]) => {
@@ -29,10 +33,16 @@ function Sidebar(props: SidebarProps) {
     props.onBrandFilterChange(newSelectedBrands); // Send selected brands to ProductListing for filtering logic
   };
 
-  // Update the selected prince range state and notify the parent component about the changes
+  // Update the selected price range state and notify the parent component about the changes
   const handlePriceFilterChange = (minPrice: number, maxPrice: number) => {
     setPriceRange([minPrice, maxPrice]);
     props.onPriceFilterChange(minPrice, maxPrice);
+  };
+
+  // Update the selected rating state and notify the parent component about the changes
+  const handleRatingsFilterChange = (rating: number) => {
+    setSelectedRatings(rating);
+    props.onRatingsFilterChange(rating);
   };
 
   return (
@@ -57,7 +67,7 @@ function Sidebar(props: SidebarProps) {
                               </h3>
                               {/* Show partial list and 'Read more' if more than 4 items */}
 
-                              {values.length > 4 ? (
+                              {Array.isArray(values) && values.length > 4 ? (
                                 seeMorePopular ? (
                                   <ul className="text-clamp10 tracking-normal mb-[5%] leading-5">
                                     {values.slice(0, 4).map((item, index) => (
@@ -115,13 +125,14 @@ function Sidebar(props: SidebarProps) {
                               ) : (
                                 <ul className="text-clamp10 mb-[5%] leading-5">
                                   {/* Render all items if less than or equal to 4 */}
-                                  {values.map((item, index) => (
-                                    <li
-                                      key={`popular-default-${item}-${index}-${key}`}
-                                    >
-                                      {item}
-                                    </li>
-                                  ))}
+                                  {Array.isArray(values) &&
+                                    values.map((item, index) => (
+                                      <li
+                                        key={`popular-default-${item}-${index}-${key}`}
+                                      >
+                                        {item}
+                                      </li>
+                                    ))}
                                 </ul>
                               )}
                               <div className="border-t-[0.5px] border-gray-300 mb-[4%]">
@@ -136,9 +147,10 @@ function Sidebar(props: SidebarProps) {
                                 {key}
                               </h3>
                               <ul className="text-clamp10 mb-[5%] leading-5">
-                                {values.map((item, index) => (
-                                  <li key={`${item}-${index}`}>{item}</li>
-                                ))}
+                                {Array.isArray(values) &&
+                                  values.map((item, index) => (
+                                    <li key={`${item}-${index}`}>{item}</li>
+                                  ))}
                               </ul>
                             </div>
                           );
@@ -148,16 +160,19 @@ function Sidebar(props: SidebarProps) {
                               <h3 className="font-bold text-clamp12 tracking-wide mb-[2%]">
                                 {key}
                               </h3>
-                              <div className="flex items-center mb-[5%]">
-                                <div className="-mt-[2%] -ml-[1%]">
+
+                              <div className="-ml-[1%]">
+                                {typeof values === "number" && (
                                   <StarRating
                                     rating={values}
-                                    fontSize="clamp(0.5625rem, 0.1884rem + 1.5962vi, 1.625rem)"
+                                    isStarInteractive={true}
+                                    fontSize="clamp(0.75rem, 0.5079rem + 1.0329vw, 1.4375rem)"
+                                    id={props.id}
+                                    onRatingsFilterChange={
+                                      handleRatingsFilterChange
+                                    }
                                   />
-                                </div>
-                                <span className="text-clamp3 hover:cursor-pointer hover:text-amber-500 -ml-[6%] -mt-[2%]">
-                                  & Up
-                                </span>
+                                )}
                               </div>
                             </div>
                           );
@@ -168,11 +183,13 @@ function Sidebar(props: SidebarProps) {
                                 {key}
                               </h3>
 
-                              <BrandsFilter
-                                id={props.id}
-                                brands={values}
-                                onBrandFilterChange={handleBrandFilterChange}
-                              />
+                              {Array.isArray(values) && (
+                                <BrandsFilter
+                                  id={props.id}
+                                  brands={values}
+                                  onBrandFilterChange={handleBrandFilterChange}
+                                />
+                              )}
                             </div>
                           );
                         case "Price":
@@ -182,12 +199,14 @@ function Sidebar(props: SidebarProps) {
                                 {key}
                               </h3>
                               <div className="mb-[5%]">
-                                <PriceRangeSlider
-                                  id={props.id}
-                                  min={values[0]}
-                                  max={values[1]}
-                                  onPriceChange={handlePriceFilterChange}
-                                />
+                                {Array.isArray(values) && (
+                                  <PriceRangeSlider
+                                    id={props.id}
+                                    min={values[0]}
+                                    max={values[1]}
+                                    onPriceChange={handlePriceFilterChange}
+                                  />
+                                )}
                               </div>
                             </div>
                           );
@@ -198,9 +217,10 @@ function Sidebar(props: SidebarProps) {
                                 {key}
                               </h3>
                               <ul className="text-clamp10 leading-5 mb-[4%]">
-                                {values.map((item, index) => (
-                                  <li key={`${item}-${index}`}>{item}</li>
-                                ))}
+                                {Array.isArray(values) &&
+                                  values.map((item, index) => (
+                                    <li key={`${item}-${index}`}>{item}</li>
+                                  ))}
                               </ul>
                             </div>
                           );
@@ -211,20 +231,21 @@ function Sidebar(props: SidebarProps) {
                                 {key}
                               </h3>
                               <ul className="text-clamp10 -ml-[1.5%] leading-5 mb-[4%]">
-                                {values.map((item, index) => (
-                                  <li
-                                    key={`${item}-${index}`}
-                                    className="flex items-center"
-                                  >
-                                    <input
-                                      type="checkbox"
-                                      id={item}
-                                      name={item}
-                                      className="w-[10%] h-4"
-                                    />
-                                    <label htmlFor={item}>{item}</label>
-                                  </li>
-                                ))}
+                                {Array.isArray(values) &&
+                                  values.map((item, index) => (
+                                    <li
+                                      key={`${item}-${index}`}
+                                      className="flex items-center"
+                                    >
+                                      <input
+                                        type="checkbox"
+                                        id={item}
+                                        name={item}
+                                        className="w-[10%] h-4"
+                                      />
+                                      <label htmlFor={item}>{item}</label>
+                                    </li>
+                                  ))}
                               </ul>
                             </div>
                           );
@@ -235,9 +256,10 @@ function Sidebar(props: SidebarProps) {
                                 {key}
                               </h3>
                               <ul className="text-clamp10 leading-5 mb-[4%]">
-                                {values.map((item, index) => (
-                                  <li key={`${item}-${index}`}>{item}</li>
-                                ))}
+                                {Array.isArray(values) &&
+                                  values.map((item, index) => (
+                                    <li key={`${item}-${index}`}>{item}</li>
+                                  ))}
                               </ul>
                             </div>
                           );
@@ -247,7 +269,9 @@ function Sidebar(props: SidebarProps) {
                               <h3 className="font-bold text-clamp12 tracking-wide mb-[1%]">
                                 {key}
                               </h3>
-                              {values.length > 2 && seeMoreSeller ? (
+                              {Array.isArray(values) &&
+                              values.length > 2 &&
+                              seeMoreSeller ? (
                                 <ul className="text-clamp10 -ml-[1.5%] leading-5">
                                   {values.slice(0, 2).map((item, index) => (
                                     <li
@@ -282,20 +306,21 @@ function Sidebar(props: SidebarProps) {
                                 </ul>
                               ) : (
                                 <ul className="text-clamp10 -ml-[1.5%] leading-5">
-                                  {values.map((item, index) => (
-                                    <li
-                                      key={`Full-array-${item}-${index}`}
-                                      className="flex items-center"
-                                    >
-                                      <input
-                                        type="checkbox"
-                                        id={item}
-                                        name={item}
-                                        className="w-[10%] h-4"
-                                      />
-                                      <label htmlFor={item}>{item}</label>
-                                    </li>
-                                  ))}
+                                  {Array.isArray(values) &&
+                                    values.map((item, index) => (
+                                      <li
+                                        key={`Full-array-${item}-${index}`}
+                                        className="flex items-center"
+                                      >
+                                        <input
+                                          type="checkbox"
+                                          id={item}
+                                          name={item}
+                                          className="w-[10%] h-4"
+                                        />
+                                        <label htmlFor={item}>{item}</label>
+                                      </li>
+                                    ))}
                                   <div className="flex items-center">
                                     <KeyboardArrowUpIcon
                                       style={{
