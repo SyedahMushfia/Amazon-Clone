@@ -13,9 +13,14 @@ const useProductFilters = (allProducts: Data[], id: string | undefined) => {
     return getFromLocalStorage(`selectedBrands-${id}`) || [];
   });
 
-  // State to store the selected price range
+  // State to store the selected price range from the PriceRangeSlider component
   const [selectedPriceRange, setSelectedPriceRange] = useState<number[]>(() => {
     return getFromLocalStorage(`selectedPriceRange-${id}`) || [0, 550];
+  });
+
+  // State to store the selected rating from the StarRating component
+  const [selectedRatings, setSelectedRatings] = useState<number>(() => {
+    return getFromLocalStorage(`selectedRatings-${id}`) || 4;
   });
 
   // Find the product matching the current id
@@ -26,16 +31,19 @@ const useProductFilters = (allProducts: Data[], id: string | undefined) => {
     if (matchedProduct && matchedProduct.data) {
       const savedBrands = getFromLocalStorage(`selectedBrands-${id}`);
       const savedPriceRange = getFromLocalStorage(`selectedPriceRange-${id}`);
+      const savedRatings = getFromLocalStorage(`selectedRatings-${id}`);
       const savedProducts = getFromLocalStorage(`filteredProducts-${id}`);
 
-      // Restore brands and price range if available
+      // Restore brands, price range and rating if available
       if (savedBrands) {
         setSelectedBrands(savedBrands);
-        console.log(`Restored selected brands: ${savedBrands}`);
       }
       if (savedPriceRange) {
         setSelectedPriceRange(savedPriceRange);
-        console.log(`Restored price range: ${savedPriceRange}`);
+      }
+
+      if (savedRatings) {
+        setSelectedRatings(savedRatings);
       }
 
       // Restore filtered products if available
@@ -54,15 +62,17 @@ const useProductFilters = (allProducts: Data[], id: string | undefined) => {
           (product: ProductDetails) =>
             product.listPrice >= savedPriceRange &&
             product.listPrice <= savedPriceRange
+        )
+        .filter((product: ProductDetails) =>
+          savedRatings ? product.rating >= savedRatings : true
         );
 
       setFilteredProducts(filtered);
       saveToLocalStorage(`filteredProducts-${id}`, filtered);
-      console.log(`Filtered products after restoring state: ${filtered}`);
     }
-  }, [selectedBrands, selectedPriceRange, matchedProduct, id]);
+  }, [selectedBrands, selectedPriceRange, selectedRatings, matchedProduct, id]);
 
-  // Effect to re-apply filters whenever selected brands or price range change
+  // Effect to re-apply filters whenever selected brands, price range or ratings change
   useEffect(() => {
     if (matchedProduct && matchedProduct.data) {
       const filtered = matchedProduct.data
@@ -75,13 +85,15 @@ const useProductFilters = (allProducts: Data[], id: string | undefined) => {
           (product: ProductDetails) =>
             product.listPrice >= selectedPriceRange[0] &&
             product.listPrice <= selectedPriceRange[1]
+        )
+        .filter((product: ProductDetails) =>
+          selectedRatings ? product.rating >= selectedRatings : true
         );
 
       setFilteredProducts(filtered);
       saveToLocalStorage(`filteredProducts-${id}`, filtered);
-      console.log(`Filtered products based on selected filters: ${filtered}`);
     }
-  }, [selectedBrands, selectedPriceRange, matchedProduct, id]);
+  }, [selectedBrands, selectedPriceRange, selectedRatings, matchedProduct, id]);
 
   // Handle changes in selected brands and save to localStorage
   const handleBrandFilterChange = (selectedBrands: string[]) => {
@@ -96,7 +108,18 @@ const useProductFilters = (allProducts: Data[], id: string | undefined) => {
     saveToLocalStorage(`selectedPriceRange-${id}`, updatedPriceRange);
   };
 
-  return { filteredProducts, handleBrandFilterChange, handlePriceFilterChange };
+  // Handle changes in selected rating and save to localStorage
+  const handleRatingsChange = (rating: number) => {
+    setSelectedRatings(rating);
+    saveToLocalStorage(`selectedRatings-${id}`, rating);
+  };
+
+  return {
+    filteredProducts,
+    handleBrandFilterChange,
+    handlePriceFilterChange,
+    handleRatingsChange,
+  };
 };
 
 export default useProductFilters;
