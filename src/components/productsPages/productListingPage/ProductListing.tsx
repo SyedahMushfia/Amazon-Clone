@@ -2,28 +2,20 @@ import { useParams, Navigate } from "react-router-dom";
 import Sidebar from "./sidebar/Sidebar";
 import DropdownButton from "./DropdownButton";
 import ProductListingResults from "./results/ProductListingResults";
-import { useProductDetails, useSidebarData } from "../dataFetchingHooks";
-import { useEffect, useState } from "react";
-import { Data, ProductDetails } from "../../../interfaces";
+import { useProductDetails, useSidebarData } from "../useDataFetchingHooks";
+import useProductFilters from "./useProductFilters";
 
 function ProductListing() {
   const { id } = useParams<{ id: string }>();
   // Fetch product details
-  const { productDetails, allProducts } = useProductDetails();
+  const { allProducts } = useProductDetails();
 
   // Fetch sidebar data
   const { sidebarData } = useSidebarData();
 
-  // State to manage the list of filtered products based on selected brands
-  const [filteredProducts, setFilteredProducts] = useState<ProductDetails[]>(
-    []
-  );
-
-  // State to manage the selected brands from the BrandsFilter component
-  const [selectedBrands, setSelectedBrands] = useState<string[]>(() => {
-    const savedSelectedBrands = localStorage.getItem(`selectedBrands-${id}`);
-    return savedSelectedBrands ? JSON.parse(savedSelectedBrands) : [];
-  });
+  // Get filtered products and handler functions
+  const { filteredProducts, handleBrandFilterChange, handlePriceFilterChange } =
+    useProductFilters(allProducts, id);
 
   // Redirect to NotFoundPage if 'id' parameter is missing
   if (!id) {
@@ -34,56 +26,6 @@ function ProductListing() {
   const matchedCategory = {
     product: allProducts.find((product) => product.id === id),
     sidebarData: sidebarData.find((sidebar) => sidebar.id === id),
-  };
-
-  useEffect(() => {
-    if (matchedCategory.product) {
-      const savedBrands = localStorage.getItem(`selectedBrands-${id}`);
-      const savedProducts = localStorage.getItem(`filteredProducts-${id}`);
-
-      if (savedBrands) {
-        const parsedBrands = JSON.parse(savedBrands);
-        setSelectedBrands(parsedBrands);
-        console.log(`Got ${parsedBrands} after refresh`); // Log the parsed brands
-      }
-
-      if (savedProducts) {
-        const parsedProducts = JSON.parse(savedProducts);
-        setFilteredProducts(parsedProducts);
-        console.log(`Got ${parsedProducts} after refresh`); // Log the parsed products
-      } else {
-        setFilteredProducts(matchedCategory.product.data); // Set default data
-      }
-    }
-  }, [matchedCategory.product, id]);
-
-  // Function to handle changes in the selected brands from the BrandsFilter component
-  const handleBrandFilterChange = (selectedBrands: string[]) => {
-    setSelectedBrands(selectedBrands);
-
-    // If there is a matched product category, filter the products based on the selected brands
-    if (matchedCategory.product) {
-      const filtered =
-        selectedBrands.length === 0
-          ? matchedCategory.product?.data // If no brands are selected, show all products
-          : matchedCategory.product?.data.filter(
-              (detail) => selectedBrands.includes(detail.brand) // Filter products that match the selected brands
-            );
-      setFilteredProducts(filtered); // Update the state with the filtered products
-      console.log(`Filtered products ${filteredProducts}`);
-
-      localStorage.setItem(
-        `selectedBrands-${id}`,
-        JSON.stringify(selectedBrands)
-      );
-      console.log(
-        `Saved ${selectedBrands} to localStorage in ProductListing.tsx`
-      );
-      localStorage.setItem(`filteredProducts-${id}`, JSON.stringify(filtered));
-      console.log(
-        `Saved ${filteredProducts} to localStorage in ProductListing.tsx`
-      );
-    }
   };
 
   return (
@@ -103,7 +45,8 @@ function ProductListing() {
             <Sidebar
               id={id}
               sidebarData={matchedCategory.sidebarData} // Pass the relevant sidebar data for the category
-              onBrandFilterChange={handleBrandFilterChange} // Handle brand filter changes from the Sidebar
+              onBrandFilterChange={handleBrandFilterChange} // Pass brand filter change handler
+              onPriceFilterChange={handlePriceFilterChange} // Pass price filter change handler
             />
           ) : (
             <div>Error: Sidebar data is missing or invalid.</div>
