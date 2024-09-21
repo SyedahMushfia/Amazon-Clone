@@ -41,7 +41,7 @@ export interface Data {
 
 // Interface for sidebar data structure
 export interface SidebarDataDetails {
-  [key: string]: string[];
+  [key: string]: string[] | number;
 }
 
 // Interface for sidebar collection containing id and data
