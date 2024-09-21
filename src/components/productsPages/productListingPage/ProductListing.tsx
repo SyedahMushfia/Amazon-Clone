@@ -14,8 +14,12 @@ function ProductListing() {
   const { sidebarData } = useSidebarData();
 
   // Get filtered products and handler functions
-  const { filteredProducts, handleBrandFilterChange, handlePriceFilterChange } =
-    useProductFilters(allProducts, id);
+  const {
+    filteredProducts,
+    handleBrandFilterChange,
+    handlePriceFilterChange,
+    handleRatingsChange,
+  } = useProductFilters(allProducts, id);
 
   // Redirect to NotFoundPage if 'id' parameter is missing
   if (!id) {
@@ -47,6 +51,8 @@ function ProductListing() {
               sidebarData={matchedCategory.sidebarData} // Pass the relevant sidebar data for the category
               onBrandFilterChange={handleBrandFilterChange} // Pass brand filter change handler
               onPriceFilterChange={handlePriceFilterChange} // Pass price filter change handler
+              onRatingsFilterChange={handleRatingsChange} // Pass rating filter change handler
+              isStarInteractive={true} // Enable interactive star ratings
             />
           ) : (
             <div>Error: Sidebar data is missing or invalid.</div>
@@ -58,6 +64,7 @@ function ProductListing() {
             <ProductListingResults
               allProducts={filteredProducts} // Display the product list
               matchedCategory={matchedCategory.product}
+              isStarInteractive={false} // Disable interactive star ratings and use component for UI only
             />
           ) : (
             <div>Error: Products results are missing or invalid</div>
