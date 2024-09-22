@@ -4,11 +4,14 @@ import DropdownButton from "./DropdownButton";
 import ProductListingResults from "./results/ProductListingResults";
 import { useProductDetails, useSidebarData } from "../useDataFetchingHooks";
 import useProductFilters from "./useProductFilters";
+import { useState, useEffect } from "react";
+import { ProductDetails } from "../../../interfaces";
+import { getFromLocalStorage } from "../../../utils";
 
 function ProductListing() {
   const { id } = useParams<{ id: string }>();
   // Fetch product details
-  const { allProducts } = useProductDetails();
+  const { allProducts, productDetails } = useProductDetails();
 
   // Fetch sidebar data
   const { sidebarData } = useSidebarData();
@@ -21,10 +24,28 @@ function ProductListing() {
     handleRatingsChange,
   } = useProductFilters(allProducts, id);
 
+  // State for sorted products
+  const [sortedProducts, setSortedProducts] = useState<ProductDetails[]>([]);
+
   // Redirect to NotFoundPage if 'id' parameter is missing
   if (!id) {
     return <Navigate to="/notFoundPage" />;
   }
+
+  // Load sorted products from localStorage or default to filtered products on mount
+  useEffect(() => {
+    const savedSortedProducts = getFromLocalStorage(`sortedProducts-${id}`);
+    if (savedSortedProducts) {
+      setSortedProducts(savedSortedProducts);
+    } else {
+      setSortedProducts(filteredProducts);
+    }
+  }, [filteredProducts]);
+
+  // Callback to update sorted products from DropdownButton
+  const handleSort = (sorted: ProductDetails[]) => {
+    setSortedProducts(sorted);
+  };
 
   // Find the matching product and sidebar data based on the 'id' parameter
   const matchedCategory = {
@@ -41,7 +62,11 @@ function ProductListing() {
           <span className="font-bold text-amber-700">"{id}"</span>
         </p>
         {/* Dropdown button for sorting options */}
-        <DropdownButton />
+        <DropdownButton
+          products={filteredProducts}
+          onSort={handleSort}
+          id={id}
+        />
       </div>
       <div className="flex gap-[1.75%] bg-white pt-[1.5%]">
         <div className=" w-[20%] bg-white ml-[1%]">
@@ -62,7 +87,9 @@ function ProductListing() {
         <div className="bg-white w-[80%]">
           {matchedCategory ? (
             <ProductListingResults
-              allProducts={filteredProducts} // Display the product list
+              allProducts={
+                sortedProducts.length > 0 ? sortedProducts : filteredProducts
+              } // Display the product list
               matchedCategory={matchedCategory.product}
               isStarInteractive={false} // Disable interactive star ratings and use component for UI only
             />
