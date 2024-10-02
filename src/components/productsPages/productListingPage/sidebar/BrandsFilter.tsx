@@ -2,58 +2,33 @@ import { useEffect, useState } from "react";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import KeyboardArrowUpIcon from "@mui/icons-material/KeyboardArrowUp";
 import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
-import {
-  getFromLocalStorage,
-  saveToLocalStorage,
-  removeFromLocalStorage,
-} from "../../../../utils";
+import { useFilterContext } from "../../../../context/FilterContext";
 
 interface BrandsFilterProps {
   id: string;
   brands: string[]; // Array of available brand names
-  onBrandFilterChange: (selectedBrands: string[]) => void; // Callback function to handle changes in selected brands
 }
 
 function BrandsFilter(props: BrandsFilterProps) {
   // State to control the visibility of "see more" or "see less" toggle for the brand list
   const [seeMoreBrands, setIsSeeMoreBrands] = useState(true);
 
-  // State to keep track of the selected brands for filtering
-  const [selectedBrands, setSelectedBrands] = useState<string[]>(() => {
-    return getFromLocalStorage(`selectedBrands-${props.id}`) || [];
-  });
+  const { state, dispatch } = useFilterContext();
 
-  // Handle changes when a checkbox is checked or unchecked
   const handleOnChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // If the checkbox is checked, add the brand to the selectedBrands array
-    // Otherwise, remove it from the array
-    const updatedSelectedBrands = e.target.checked
-      ? [...selectedBrands, e.target.value]
-      : selectedBrands.filter((item) => item !== e.target.value);
-
-    // Update local selectedBrands state
-    setSelectedBrands(updatedSelectedBrands);
-    saveToLocalStorage(
-      `updatedSelectedBrands-${props.id}`,
-      updatedSelectedBrands
-    );
-    // Pass updated selected brands to the sidebar's handleBrandFilterChange function as an argument
-    props.onBrandFilterChange(updatedSelectedBrands);
+    const selectedBrand = e.target.value;
+    dispatch({ type: "SET_BRAND", payload: selectedBrand, id: props.id });
   };
 
   return (
     <div>
       <div>
         {/* Show "Clear" button only if there are selected brands, which allows clearing all selected filters */}
-        {selectedBrands.length > 0 && (
+        {state.selectedBrands.length > 0 && (
           <div className="flex items-center -ml-[1.5%]">
             <KeyboardArrowLeftIcon />
             <p
-              onClick={() => {
-                setSelectedBrands([]); // Clear local selected brands state
-                props.onBrandFilterChange([]); // Notify parent component to clear selected filters
-                removeFromLocalStorage(`updatedSelectedBrands-${props.id}`);
-              }}
+              onClick={() => dispatch({ type: "CLEAR_BRANDS", id: props.id })}
               className="text-clamp10 cursor-pointer -ml-[2%] mt-[0.5%]"
             >
               Clear
@@ -76,7 +51,7 @@ function BrandsFilter(props: BrandsFilterProps) {
                 value={props.brands[index]}
                 className="w-[10%] h-4 cursor-pointer"
                 onChange={handleOnChange} // Handle checkbox state change
-                checked={selectedBrands.includes(props.brands[index])} // Keep checkbox checked if brand is selected
+                checked={state.selectedBrands.includes(props.brands[index])} // Keep checkbox checked if brand is selected
               />
               <label htmlFor={props.brands[index]} className="cursor-pointer">
                 {props.brands[index]}
@@ -115,7 +90,7 @@ function BrandsFilter(props: BrandsFilterProps) {
                 value={props.brands[index]}
                 className="w-[10%] h-4 cursor-pointer"
                 onChange={handleOnChange}
-                checked={selectedBrands.includes(props.brands[index])}
+                checked={state.selectedBrands.includes(props.brands[index])}
               />
               <label htmlFor={props.brands[index]} className="cursor-pointer">
                 {props.brands[index]}

@@ -5,6 +5,7 @@ interface ProductListProps {
   allProducts: ProductDetails[]; // Array of product details to display
   matchedCategory: Data | undefined; // Data of the matched product category
   isStarInteractive: boolean;
+  id: string;
 }
 
 function ProductListingResults(props: ProductListProps) {
@@ -22,6 +23,7 @@ function ProductListingResults(props: ProductListProps) {
             allProducts={props.allProducts} // Pass the filtered or full list of products to the ProductCard component
             matchedCategory={props.matchedCategory}
             isStarInteractive={false}
+            id={props.id}
           />
         </div>
       </div>

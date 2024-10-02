@@ -9,9 +9,7 @@ import { SidebarData } from "../../../../interfaces";
 interface SidebarProps {
   id: string;
   sidebarData: SidebarData | undefined;
-  onBrandFilterChange: (selectedBrands: string[]) => void;
-  onPriceFilterChange: (minPrice: number, maxPrice: number) => void;
-  onRatingsFilterChange: (ratings: number) => void;
+
   isStarInteractive: boolean;
 }
 
@@ -19,31 +17,6 @@ function Sidebar(props: SidebarProps) {
   // State for toggling 'Read more' and 'Read less' for different categories.
   const [seeMorePopular, setIsSeeMorePopular] = useState(true);
   const [seeMoreSeller, setIsSeeMoreSeller] = useState(true);
-
-  // Manage the selected brands, price range and ratings recieved from the BrandsFilter component
-  const [selectedBrands, setSelectedBrands] = useState<string[]>([]);
-
-  const [priceRange, setPriceRange] = useState<number[]>([0, 550]);
-
-  const [selectedRatings, setSelectedRatings] = useState<number>(4);
-
-  // Update the selected brands state and notify the parent component about the changes
-  const handleBrandFilterChange = (newSelectedBrands: string[]) => {
-    setSelectedBrands(newSelectedBrands); // Update local selected brands state
-    props.onBrandFilterChange(newSelectedBrands); // Send selected brands to ProductListing for filtering logic
-  };
-
-  // Update the selected price range state and notify the parent component about the changes
-  const handlePriceFilterChange = (minPrice: number, maxPrice: number) => {
-    setPriceRange([minPrice, maxPrice]);
-    props.onPriceFilterChange(minPrice, maxPrice);
-  };
-
-  // Update the selected rating state and notify the parent component about the changes
-  const handleRatingsFilterChange = (rating: number) => {
-    setSelectedRatings(rating);
-    props.onRatingsFilterChange(rating);
-  };
 
   return (
     <>
@@ -168,9 +141,6 @@ function Sidebar(props: SidebarProps) {
                                     isStarInteractive={true}
                                     fontSize="clamp(0.75rem, 0.5079rem + 1.0329vw, 1.4375rem)"
                                     id={props.id}
-                                    onRatingsFilterChange={
-                                      handleRatingsFilterChange
-                                    }
                                   />
                                 )}
                               </div>
@@ -184,11 +154,7 @@ function Sidebar(props: SidebarProps) {
                               </h3>
 
                               {Array.isArray(values) && (
-                                <BrandsFilter
-                                  id={props.id}
-                                  brands={values}
-                                  onBrandFilterChange={handleBrandFilterChange}
-                                />
+                                <BrandsFilter id={props.id} brands={values} />
                               )}
                             </div>
                           );
@@ -204,7 +170,6 @@ function Sidebar(props: SidebarProps) {
                                     id={props.id}
                                     min={values[0]}
                                     max={values[1]}
-                                    onPriceChange={handlePriceFilterChange}
                                   />
                                 )}
                               </div>

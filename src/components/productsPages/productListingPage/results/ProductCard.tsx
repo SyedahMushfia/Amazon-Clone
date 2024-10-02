@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import StarRating from "../../StarRating";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import RenderColourOptions from "../../RenderColourOptions";
@@ -9,17 +10,32 @@ import {
   calculateDeliveryDate,
 } from "../../../../utils";
 import FormattedPrice from "../../FormattedPrice";
-import { ProductDetails, Data } from "../../../../interfaces";
+import { ProductDetails, Data, CartItem } from "../../../../interfaces";
+import { useStateContext } from "../../../../context/StateContext";
 
 interface ProductListProps {
   allProducts: ProductDetails[]; // Array of product details to display
   matchedCategory: Data | undefined; // Data of the matched product category
   isStarInteractive: boolean;
+  id: string;
 }
 
 function ProductCard(props: ProductListProps) {
   // Fetch user's country
   const { country } = useFetchCountry();
+
+  const { state, dispatch } = useStateContext();
+
+  useEffect(() => {
+    console.log(`This is the cart: ${JSON.stringify(state.cart)}`);
+  }, [state.cart]);
+
+  const handleAddToCart = (product: CartItem) => {
+    dispatch({
+      type: "ADD_TO_CART",
+      payload: product,
+    });
+  };
 
   return (
     <>
@@ -56,6 +72,7 @@ function ProductCard(props: ProductListProps) {
                   rating={details.rating}
                   fontSize="clamp(0.5625rem, 0.2984rem + 1.1268vi, 1.3125rem)"
                   isStarInteractive={false}
+                  id={props.id}
                 />
                 <KeyboardArrowDownIcon
                   style={{
@@ -111,7 +128,27 @@ function ProductCard(props: ProductListProps) {
                 </span>
               </p>
               <p className="text-clamp1 mt-[0.5%]">Ships to {country}</p>
-              <button className="bg-yellow-400 px-[1.75%] py-[0.5%] mt-[1%] mb-[1%] rounded-[25px] text-clamp10">
+              <button
+                onClick={() => {
+                  const product: CartItem = {
+                    name: details.name,
+                    price: details.discount
+                      ? calculateDiscountedPrice(
+                          details.listPrice,
+                          details.discount
+                        )
+                      : details.listPrice,
+                    image: details.imageURLs[0],
+                    color: details.Color && details.Color[0],
+                    monthlySalesCount: details.monthlySalesCount,
+                    Size: details.Size,
+                    Style: details.Style,
+                    quantity: 1,
+                  };
+                  handleAddToCart(product);
+                }}
+                className="bg-yellow-400 px-[1.75%] py-[0.5%] mt-[1%] mb-[1%] rounded-[25px] text-clamp10"
+              >
                 Add to cart
               </button>
               {details.Color ? (

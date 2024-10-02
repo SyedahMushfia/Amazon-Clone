@@ -3,26 +3,20 @@ import Sidebar from "./sidebar/Sidebar";
 import DropdownButton from "./DropdownButton";
 import ProductListingResults from "./results/ProductListingResults";
 import { useProductDetails, useSidebarData } from "../useDataFetchingHooks";
-import useProductFilters from "./useProductFilters";
 import { useState, useEffect } from "react";
 import { ProductDetails } from "../../../interfaces";
-import { getFromLocalStorage } from "../../../utils";
+import { calculateDiscountedPrice } from "../../../utils";
+import { useFilterContext } from "../../../context/FilterContext";
 
 function ProductListing() {
   const { id } = useParams<{ id: string }>();
   // Fetch product details
-  const { allProducts, productDetails } = useProductDetails();
+  const { allProducts, } = useProductDetails();
+
+  const { state, dispatch } = useFilterContext();
 
   // Fetch sidebar data
   const { sidebarData } = useSidebarData();
-
-  // Get filtered products and handler functions
-  const {
-    filteredProducts,
-    handleBrandFilterChange,
-    handlePriceFilterChange,
-    handleRatingsChange,
-  } = useProductFilters(allProducts, id);
 
   // State for sorted products
   const [sortedProducts, setSortedProducts] = useState<ProductDetails[]>([]);
@@ -32,25 +26,113 @@ function ProductListing() {
     return <Navigate to="/notFoundPage" />;
   }
 
-  // Load sorted products from localStorage or default to filtered products on mount
-  useEffect(() => {
-    const savedSortedProducts = getFromLocalStorage(`sortedProducts-${id}`);
-    if (savedSortedProducts) {
-      setSortedProducts(savedSortedProducts);
-    } else {
-      setSortedProducts(filteredProducts);
-    }
-  }, [filteredProducts]);
-
-  // Callback to update sorted products from DropdownButton
-  const handleSort = (sorted: ProductDetails[]) => {
-    setSortedProducts(sorted);
-  };
-
   // Find the matching product and sidebar data based on the 'id' parameter
   const matchedCategory = {
     product: allProducts.find((product) => product.id === id),
     sidebarData: sidebarData.find((sidebar) => sidebar.id === id),
+  };
+
+  let filteredProducts: ProductDetails[] = [];
+
+  if (matchedCategory.product && matchedCategory.product.data) {
+    filteredProducts = matchedCategory.product.data.filter((product) => {
+      const matchedBrands =
+        state.selectedBrands.length > 0
+          ? state.selectedBrands.includes(product.brand)
+          : true;
+
+      const finalPrice = product.discount
+        ? calculateDiscountedPrice(product.listPrice, product.discount)
+        : product.listPrice;
+
+      // Check if the product price falls within the selected price range
+      const matchedPriceRange =
+        finalPrice >= state.selectedPriceRange[0] &&
+        finalPrice <= state.selectedPriceRange[1];
+
+      const matchedRating =
+        state.selectedRating > 0
+          ? product.rating >= state.selectedRating
+          : true;
+
+      return matchedBrands && matchedPriceRange && matchedRating;
+    });
+  }
+
+  if (filteredProducts.length === 0 && matchedCategory.product) {
+    return <div>No results found based on your filters.</div>;
+  }
+  console.log(filteredProducts);
+
+  // Sort products based on selected option
+  const sortProducts = (option: string, products: ProductDetails[]) => {
+    let sortedProducts = [...products];
+    switch (option) {
+      case "Price: Low to High":
+        sortedProducts.sort((a, b) => {
+          const priceA = a.discount
+            ? a.listPrice - (a.listPrice * a.discount) / 100
+            : a.listPrice;
+          const priceB = b.discount
+            ? b.listPrice - (b.listPrice * b.discount) / 100
+            : b.listPrice;
+          return priceA - priceB;
+        });
+        break;
+      case "Price: High to Low":
+        sortedProducts.sort((a, b) => {
+          const priceA = a.discount
+            ? a.listPrice - (a.listPrice * a.discount) / 100
+            : a.listPrice;
+          const priceB = b.discount
+            ? b.listPrice - (b.listPrice * b.discount) / 100
+            : b.listPrice;
+          return priceB - priceA;
+        });
+        break;
+      case "Avg. Customer Review":
+        sortedProducts.sort((a, b) => b.reviewsCount - a.reviewsCount);
+        break;
+      case "Newest Arrivals":
+        sortedProducts.sort(
+          (a, b) =>
+            new Date(b.dateFirstAvailable).getTime() -
+            new Date(a.dateFirstAvailable).getTime()
+        );
+        break;
+      case "Best Sellers":
+        sortedProducts.sort(
+          (a, b) => b.monthlySalesCount - a.monthlySalesCount
+        );
+        break;
+      case "Featured":
+      default:
+        // "Featured" should show products in their original order
+        sortedProducts = [...products];
+        break;
+    }
+    return sortedProducts;
+  };
+
+  useEffect(() => {
+    if (filteredProducts.length > 0) {
+      const sorted = sortProducts(state.sortOrder, filteredProducts);
+
+      // Only update sortedProducts if there's an actual change
+      setSortedProducts((prevProducts) => {
+        if (JSON.stringify(prevProducts) !== JSON.stringify(sorted)) {
+          return sorted;
+        }
+        return prevProducts; // Avoid unnecessary state updates
+      });
+    } else {
+      setSortedProducts(filteredProducts);
+    }
+  }, [state.sortOrder, filteredProducts]);
+
+  // Callback to update sorted products from DropdownButton
+  const handleSort = (option: string) => {
+    dispatch({ type: "SET_SORT_OPTION", payload: option, id: id });
   };
 
   return (
@@ -62,11 +144,7 @@ function ProductListing() {
           <span className="font-bold text-amber-700">"{id}"</span>
         </p>
         {/* Dropdown button for sorting options */}
-        <DropdownButton
-          products={filteredProducts}
-          onSort={handleSort}
-          id={id}
-        />
+        <DropdownButton onSort={handleSort} id={id} />
       </div>
       <div className="flex gap-[1.75%] bg-white pt-[1.5%]">
         <div className=" w-[20%] bg-white ml-[1%]">
@@ -74,9 +152,6 @@ function ProductListing() {
             <Sidebar
               id={id}
               sidebarData={matchedCategory.sidebarData} // Pass the relevant sidebar data for the category
-              onBrandFilterChange={handleBrandFilterChange} // Pass brand filter change handler
-              onPriceFilterChange={handlePriceFilterChange} // Pass price filter change handler
-              onRatingsFilterChange={handleRatingsChange} // Pass rating filter change handler
               isStarInteractive={true} // Enable interactive star ratings
             />
           ) : (
@@ -92,6 +167,7 @@ function ProductListing() {
               } // Display the product list
               matchedCategory={matchedCategory.product}
               isStarInteractive={false} // Disable interactive star ratings and use component for UI only
+              id={id}
             />
           ) : (
             <div>Error: Products results are missing or invalid</div>

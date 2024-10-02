@@ -3,19 +3,14 @@ import StarBorderIcon from "@mui/icons-material/StarBorder";
 import StarHalfIcon from "@mui/icons-material/StarHalf";
 import KeyboardArrowLeftIcon from "@mui/icons-material/KeyboardArrowLeft";
 import { useState, useEffect } from "react";
-import {
-  saveToLocalStorage,
-  getFromLocalStorage,
-  removeFromLocalStorage,
-} from "../../utils";
+import { useFilterContext } from "../../context/FilterContext";
 
 interface StarRatingProps {
   rating: number; // The rating value to display
   totalStars?: number; // Optional prop for the total number of stars
   fontSize: string; // The size of the star icons
   isStarInteractive: boolean; // Flag to make stars clickable
-  id?: string;
-  onRatingsFilterChange?: (rating: number) => void;
+  id: string;
 }
 
 function StarRating(props: StarRatingProps) {
@@ -23,22 +18,21 @@ function StarRating(props: StarRatingProps) {
   const totalStars = 5;
   const stars = [];
 
-  // Initialize selectedRating from local storage or default to the rating prop
-  const [selectedRating, setSelectedRating] = useState<number>(() => {
-    const savedRating = getFromLocalStorage(`selectedRating-${props.id}`);
-    return savedRating !== null ? Number(savedRating) : rating;
-  });
+  const { state, dispatch } = useFilterContext();
+
+  const [selectedRating, setSelectedRating] = useState<number>(rating);
 
   const [showClearButton, setShowClearButton] = useState(false); // State to show/hide "Clear" button
-
   // If stars are interactive, allow click to set selected rating
   if (props.isStarInteractive) {
     const handleClick = (index: number) => {
       setSelectedRating(index);
-      console.log(`Star clicked: ${index}`);
 
-      saveToLocalStorage(`index-${props.id}`, index);
-      props.onRatingsFilterChange?.(index);
+      dispatch({
+        type: "SET_RATING",
+        payload: index,
+        id: props.id,
+      });
       setShowClearButton(true);
     };
 
@@ -104,9 +98,11 @@ function StarRating(props: StarRatingProps) {
     const resetValue = props.rating;
     setSelectedRating(resetValue);
 
-    saveToLocalStorage(`resetValue-${props.id}`, resetValue);
+    dispatch({
+      type: "CLEAR_RATING",
+      id: props.id,
+    });
 
-    props.onRatingsFilterChange?.(resetValue);
     setShowClearButton(false);
   };
 
