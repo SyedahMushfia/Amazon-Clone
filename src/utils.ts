@@ -2,8 +2,10 @@
 export const calculateDiscountedPrice = (
   listPrice: number,
   discount: number
-): string => {
-  const discountedPrice = (listPrice - listPrice * (discount / 100)).toFixed(2); // Calculate the discounted price and format it to 2 decimal places
+): number => {
+  const discountedPrice = parseFloat(
+    (listPrice - listPrice * (discount / 100)).toFixed(2)
+  ); // Calculate the discounted price and format it to 2 decimal places
   return discountedPrice;
 };
 

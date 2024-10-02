@@ -1,3 +1,5 @@
+import React from "react";
+
 export interface ProductProps {
   title: string;
   imageInfo: {
@@ -15,7 +17,7 @@ export interface ProductDetails {
   monthlySalesCount: number;
   isBestseller: boolean;
   listPrice: number;
-  discount: number;
+  discount?: number;
   shippingPrice: number;
   Color?: string[];
   Size?: string;
@@ -48,4 +50,119 @@ export interface SidebarDataDetails {
 export interface SidebarData {
   id: string;
   data: SidebarDataDetails[];
+}
+
+export interface FilterState {
+  selectedBrands: string[];
+  selectedPriceRange: number[];
+  selectedRating: number;
+  sortOrder: string;
+}
+
+export interface SetBrandAction {
+  type: "SET_BRAND";
+  payload: string; // Assuming each brand is represented as a string
+  id: string;
+}
+
+export interface SetPriceRangeAction {
+  type: "SET_PRICE_RANGE";
+  payload: number[]; // A tuple for the price range
+  id: string;
+}
+
+export interface SetRatingAction {
+  type: "SET_RATING";
+  payload: number; // A number for the rating
+  id: string;
+}
+
+export interface ClearBrandsAction {
+  type: "CLEAR_BRANDS"; // No payload needed for clearing brands
+  id: string;
+}
+
+export interface ClearRatingAction {
+  type: "CLEAR_RATING";
+  id: string;
+}
+
+export interface SortAction {
+  type: string;
+  payload: any;
+  id: string | undefined;
+}
+
+export type FilterAction =
+  | SetBrandAction
+  | SetPriceRangeAction
+  | SetRatingAction
+  | ClearBrandsAction
+  | ClearRatingAction
+  | SortAction;
+
+export interface FilterContextType {
+  state: FilterState;
+  dispatch: React.Dispatch<FilterAction>;
+}
+
+export interface FilterProviderProps {
+  children: React.ReactNode;
+}
+
+export interface CartItem {
+  name: string;
+  price: number;
+  image: string;
+  color: string | undefined;
+  Size: string | undefined;
+  Style: string | undefined;
+  quantity: number;
+  monthlySalesCount: number;
+}
+
+export interface CartState {
+  cart: CartItem[];
+  savedItems: CartItem[];
+}
+
+export interface AddToCartAction {
+  type: "ADD_TO_CART";
+  payload: CartItem;
+}
+
+export interface UpdateQuantityAction {
+  type: "UPDATE_QUANTITY";
+  payload: { name: string; quantity: number };
+}
+
+export interface RemoveFromCartAction {
+  type: "REMOVE_FROM_CART";
+  payload: { name: string };
+}
+
+export interface SaveForLaterAction {
+  type: "SAVE_FOR_LATER";
+  payload: CartItem;
+}
+
+export interface RemoveFromSavedAction {
+  type: "REMOVE_FROM_SAVED";
+  payload: { name: string };
+}
+
+export type CartAction =
+  | AddToCartAction
+  | RemoveFromCartAction
+  | UpdateQuantityAction
+  | SaveForLaterAction
+  | RemoveFromSavedAction;
+
+export interface CartContextProps {
+  state: CartState;
+  dispatch: React.Dispatch<CartAction>;
+}
+
+export interface StateProviderProps {
+  children: React.ReactNode;
 }
