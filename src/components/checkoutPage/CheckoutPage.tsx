@@ -1,6 +1,12 @@
 import Subtotal from "./Subtotal";
+import { useStateContext } from "../../context/StateContext";
+import { getCartTotal } from "../../context/StateReducer";
+import CartItems from "./CartItems";
+import SavedItems from "./SavedItems";
 
 function CheckoutPage() {
+  const { state } = useStateContext();
+
   return (
     <>
       <div className="flex bg-slate-200">
@@ -11,12 +17,22 @@ function CheckoutPage() {
               <span className="flex justify-end font-sans text-[14.5px] text-slate-600 tracking-wide">
                 Price
               </span>
-              <div className="border-slate-300 border-t-[0.5px]">
+              <div className="border-slate-300 border-t-[0.5px] mb-[3%]">
                 {/*Line Break */}
               </div>
             </div>
+            <div>
+              {/* Rendering each product in the cart using the CartItems component */}
+              {state.cart &&
+                state.cart.map((product) => (
+                  <CartItems key={product.name} product={product} />
+                ))}
+            </div>
           </div>
-          <div className="bg-white">Saved Items</div>
+          <div className="bg-white min-h-[13vh]">
+            {/* Rendering saved items if there are any */}
+            {state.savedItems.length > 0 && <SavedItems />}
+          </div>
           <div className="font-sans text-[12px] tracking-wide my-[2%]">
             <span className="inline-block">
               The price and availability of items at Amazon.com are subject to
@@ -30,7 +46,7 @@ function CheckoutPage() {
             </span>
           </div>
         </div>
-        <Subtotal value={0} />
+        <Subtotal totalPrice={getCartTotal(state.cart)} />
       </div>
     </>
   );
