@@ -2,15 +2,10 @@ import GridLayoutCard from "./productcardlayouts/GridLayoutCard";
 import SingleImgCard from "./productcardlayouts/SingleImgCard";
 import MultipleImgCard from "./productcardlayouts/MultipleImgCard";
 import { ProductProps } from "../../interfaces";
-import {
-  ImageInfoProps,
-  useImageStylingContext,
-} from "../../context/ImageStylingContext";
+import { ImageInfoProps, images } from "./homeImages";
 import { isEqual } from "lodash";
 
 function Product({ title, imageInfo, link }: ProductProps) {
-  const images = useImageStylingContext();
-
   let imageArray: ImageInfoProps[keyof ImageInfoProps] = [];
 
   //Get the array from the images object & compare it with the imageInfo prop.
