@@ -1,8 +1,11 @@
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import SearchIcon from "@mui/icons-material/Search";
 import { Link } from "react-router-dom";
+import { useStateContext } from "../../context/StateContext";
 
 function NavigationOne() {
+  const { state } = useStateContext();
+
   return (
     <>
       <div className="bg-gray-900 h-[4.5vw] flex content-center justify-evenly w-full">
@@ -111,8 +114,9 @@ function NavigationOne() {
           {/* cart */}
           <Link to="/checkout">
             <div className="flex w-[90%] py-[5%] justify-center items-center">
+              {/* Display the total quantity of items in the cart */}
               <span className="text-orange-400 font-sans font-bold text-clamp4 -mr-[30%] -mt-[15%]">
-                0
+                {state.cart.reduce((acc, item) => acc + item.quantity, 0)}
               </span>
 
               <img
