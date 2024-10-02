@@ -1,3 +1,5 @@
+import { useStateContext } from "../../context/StateContext";
+
 //For currency formatting:
 const formatCurrency = (value: number) => {
   return Intl.NumberFormat("en-US", {
@@ -9,17 +11,24 @@ const formatCurrency = (value: number) => {
 };
 
 interface CurrencyComponentProps {
-  value: number;
+  totalPrice: number;
 }
 
 function Subtotal(props: CurrencyComponentProps) {
-  const formattedValue = formatCurrency(props.value);
+  const { state } = useStateContext();
+
+  const formattedValue = formatCurrency(props.totalPrice);
 
   return (
     <>
       <div className="bg-white flex-[1_1_22.25%] mr-[1.5%] mt-[1.5%] px-[1.75%] py-[1.5%] h-[25vh]">
         <h1 className="font-sans text-[20px]">
-          Subtotal (0 items): <strong>{formattedValue}</strong>
+          {/* Display total items and formatted subtotal price */}
+          Subtotal ({state.cart.reduce(
+            (acc, item) => acc + item.quantity,
+            0
+          )}{" "}
+          items): <strong>{formattedValue}</strong>
         </h1>
         <div className="flex mb-[5%]">
           <input type="checkbox" id="hasGiftCheckbox" />
