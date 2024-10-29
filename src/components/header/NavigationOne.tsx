@@ -2,9 +2,21 @@ import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import SearchIcon from "@mui/icons-material/Search";
 import { Link } from "react-router-dom";
 import { useStateContext } from "../../context/StateContext";
+import { useState } from "react";
+import DropdownSignIn from "./DropdownSignIn";
 
 function NavigationOne() {
   const { state } = useStateContext();
+
+  const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+
+  const handleMouseEnter = () => {
+    setIsDropdownVisible(true);
+  };
+
+  const handleMouseLeave = () => {
+    setIsDropdownVisible(false);
+  };
 
   return (
     <>
@@ -85,34 +97,55 @@ function NavigationOne() {
             />
           </div>
           {/* account & lists */}
-          <div className="w-[32%] h-[65%] ">
-            <span className="font-sans text-clamp3 text-white tracking-wide block mt-[2%]">
-              Hello, sign in
-            </span>
-            <div className="flex -mt-[3%]">
-              <span className="font-sans text-clamp4 font-bold text-white block ">
-                Account & Lists
+          <Link to="/signIn">
+            <div
+              className="flex flex-col justify-center relative"
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
+            >
+              <span className="font-sans text-clamp3 text-white tracking-wide mt-[3%]">
+                Hello, {state.user ? state.user.displayName : "sign in"}
               </span>
-              <ArrowDropDownIcon
-                className="text-zinc-400"
-                style={{
-                  fontSize: "clamp(0.375rem, 0.0009rem + 1.5962vi, 1.4375rem)",
-                }}
-              />
+              <div className="flex -mt-[5%]">
+                <span className="font-sans text-clamp4 font-bold text-white ">
+                  Account & Lists
+                </span>
+                <ArrowDropDownIcon
+                  className="text-zinc-400"
+                  style={{
+                    fontSize:
+                      "clamp(0.375rem, 0.0009rem + 1.5962vi, 1.4375rem)",
+                  }}
+                />
+              </div>
             </div>
-          </div>
+            {isDropdownVisible && (
+              <DropdownSignIn
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+              />
+            )}
+          </Link>
+          {/* <DropdownSignIn /> */}
+          {isDropdownVisible && (
+            <div
+              className="fixed top-14 inset-0 bg-black opacity-50 z-40"
+              onMouseEnter={handleMouseEnter}
+              onMouseLeave={handleMouseLeave}
+            />
+          )}
           {/* returns & orders */}
           <div className="w-[20%] h-[65%] ml-[2%]">
-            <span className="block font-sans text-clamp3 text-white tracking-wide mt-[2%]">
+            <span className="block font-sans text-clamp3 text-white tracking-wide mt-[4%]">
               Returns
             </span>
 
-            <span className="block font-sans text-clamp4 font-bold text-white tracking-wide -mt-[3%]">
+            <span className="block font-sans text-clamp4 font-bold text-white tracking-wide -mt-[6%]">
               & Orders
             </span>
           </div>
           {/* cart */}
-          <Link to="/checkout">
+          <Link to="/cart">
             <div className="flex w-[90%] py-[5%] justify-center items-center">
               {/* Display the total quantity of items in the cart */}
               <span className="text-orange-400 font-sans font-bold text-clamp4 -mr-[30%] -mt-[15%]">
