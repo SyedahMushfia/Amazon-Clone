@@ -1,4 +1,5 @@
 import React from "react";
+import { User } from "firebase/auth";
 
 export interface ProductProps {
   title: string;
@@ -18,7 +19,7 @@ export interface ProductDetails {
   isBestseller: boolean;
   listPrice: number;
   discount?: number;
-  shippingPrice: number;
+  shippingCharge: number;
   Color?: string[];
   Size?: string;
   Style?: string;
@@ -119,11 +120,13 @@ export interface CartItem {
   Style: string | undefined;
   quantity: number;
   monthlySalesCount: number;
+  shippingCharge: number;
 }
 
 export interface CartState {
   cart: CartItem[];
   savedItems: CartItem[];
+  user: User | null;
 }
 
 export interface AddToCartAction {
@@ -151,12 +154,30 @@ export interface RemoveFromSavedAction {
   payload: { name: string };
 }
 
+export interface LoadCartAction {
+  type: "LOAD_CART";
+  payload: CartItem[];
+}
+
+export interface LoadSavedItemsAction {
+  type: "LOAD_SAVED_ITEMS";
+  payload: CartItem[];
+}
+
+export interface SetUserAction {
+  type: "SET_USER";
+  payload: User | null;
+}
+
 export type CartAction =
   | AddToCartAction
   | RemoveFromCartAction
   | UpdateQuantityAction
   | SaveForLaterAction
-  | RemoveFromSavedAction;
+  | RemoveFromSavedAction
+  | LoadCartAction
+  | LoadSavedItemsAction
+  | SetUserAction;
 
 export interface CartContextProps {
   state: CartState;
@@ -165,4 +186,15 @@ export interface CartContextProps {
 
 export interface StateProviderProps {
   children: React.ReactNode;
+}
+
+export interface InputField {
+  id: string;
+  label: string;
+  type: string;
+  placeholder?: string;
+}
+
+export interface Form {
+  [key: string]: string;
 }

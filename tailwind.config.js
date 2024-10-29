@@ -38,6 +38,7 @@ export default {
         clamp16: "clamp(0.75rem, 0.3759rem + 1.5962vi, 1.8125rem)",
         clamp17: "clamp(0.5rem, 0.2579rem + 1.0329vw, 1.1875rem)",
         clamp18: "clamp(0.9375rem, 0.6954rem + 1.0329vw, 1.625rem)",
+        clamp19: "clamp(0.875rem, 0.743rem + 0.5634vw, 1.25rem)",
       },
 
       inset: {
