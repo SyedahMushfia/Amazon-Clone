@@ -1,4 +1,5 @@
 import { useStateContext } from "../../context/StateContext";
+import { useNavigate } from "react-router-dom";
 
 //For currency formatting:
 const formatCurrency = (value: number) => {
@@ -17,7 +18,15 @@ interface CurrencyComponentProps {
 function Subtotal(props: CurrencyComponentProps) {
   const { state } = useStateContext();
 
+  const navigate = useNavigate();
+
   const formattedValue = formatCurrency(props.totalPrice);
+
+  const handleCheckoutClick = () => {
+    console.log(state.user);
+    if (state.user) navigate("/checkout");
+    else navigate("/signIn");
+  };
 
   return (
     <>
@@ -28,7 +37,10 @@ function Subtotal(props: CurrencyComponentProps) {
             (acc, item) => acc + item.quantity,
             0
           )}{" "}
-          items): <strong>{formattedValue}</strong>
+          {state.cart.reduce((acc, item) => acc + item.quantity, 0) === 1
+            ? "item"
+            : "items"}
+          ): <strong>{formattedValue}</strong>
         </h1>
         <div className="flex mb-[5%]">
           <input type="checkbox" id="hasGiftCheckbox" />
@@ -39,7 +51,10 @@ function Subtotal(props: CurrencyComponentProps) {
             This order contains a gift
           </label>
         </div>
-        <button className="font-sans text-[13.5px] bg-amber-300 py-[2%]  w-[100%] rounded-[0.5rem]">
+        <button
+          onClick={handleCheckoutClick}
+          className="font-sans text-[13.5px] bg-amber-300 py-[2%]  w-[100%] rounded-[0.5rem]"
+        >
           Proceed to checkout
         </button>
       </div>
