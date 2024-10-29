@@ -1,5 +1,9 @@
 import { useStateContext } from "../../context/StateContext";
-import { formatSalesCount } from "../../utils";
+import {
+  formatSalesCount,
+  removeSavedItemsFromFirestore,
+  updateCartItemInFirestore,
+} from "../../utils";
 import { GetColorName } from "hex-color-to-color-name";
 
 const formatCurrency = (value: number) => {
@@ -28,7 +32,10 @@ function SavedItems() {
       </div>
       <div className="flex justify-start gap-4 pl-[2.25%] font-sans pb-[5%]">
         {state.savedItems.map((product) => (
-          <div className=" w-[27%] px-[1.5%] py-[1.5%] border-[1px]">
+          <div
+            key={product.name}
+            className=" w-[27%] px-[1.5%] py-[1.5%] border-[1px]"
+          >
             <div className="w-[16.5vw] h-[34vh]">
               <img
                 src={product.image}
@@ -70,6 +77,8 @@ function SavedItems() {
                   type: "REMOVE_FROM_SAVED", // Remove product from saved items
                   payload: { name: product.name },
                 });
+                updateCartItemInFirestore(state.user, product);
+                removeSavedItemsFromFirestore(state.user, product);
               }}
               className="hover: cursor-pointer border-[1px] border-slate-400 rounded-[1rem] px-[33%] py-[2.5%] mt-[4%] text-clamp3"
             >
@@ -82,6 +91,7 @@ function SavedItems() {
                   type: "REMOVE_FROM_SAVED",
                   payload: { name: product.name },
                 });
+                // removeSavedItemsFromFirestore(state.user, product);
               }}
             >
               Delete
