@@ -8,6 +8,7 @@ import {
   calculateDiscountedPrice,
   formatSalesCount,
   calculateDeliveryDate,
+  updateCartItemInFirestore,
 } from "../../../../utils";
 import FormattedPrice from "../../FormattedPrice";
 import { ProductDetails, Data, CartItem } from "../../../../interfaces";
@@ -31,10 +32,22 @@ function ProductCard(props: ProductListProps) {
   }, [state.cart]);
 
   const handleAddToCart = (product: CartItem) => {
+    const existingItem = state.cart.find((item) => item.name === product.name);
+
+    const updatedProduct = existingItem
+      ? { ...existingItem, quantity: existingItem.quantity + 1 }
+      : { ...product, quantity: 1 };
+
     dispatch({
       type: "ADD_TO_CART",
-      payload: product,
+      payload: updatedProduct,
     });
+
+    if (existingItem) {
+      updateCartItemInFirestore(state.user, updatedProduct);
+    } else {
+      updateCartItemInFirestore(state.user, updatedProduct);
+    }
   };
 
   return (
@@ -143,6 +156,7 @@ function ProductCard(props: ProductListProps) {
                     monthlySalesCount: details.monthlySalesCount,
                     Size: details.Size,
                     Style: details.Style,
+                    shippingCharge: details.shippingCharge || 0,
                     quantity: 1,
                   };
                   handleAddToCart(product);
