@@ -3,6 +3,10 @@ import { CartItem } from "../../interfaces";
 import { GetColorName } from "hex-color-to-color-name";
 import { useState, useRef, useEffect } from "react";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import {
+  removeCartItemFromFirestore,
+  updateCartItemInFirestore,
+} from "../../utils";
 
 interface CartItemProps {
   product: CartItem;
@@ -19,7 +23,7 @@ const formatCurrency = (value: number) => {
 };
 
 function CartItems(props: CartItemProps) {
-  const { dispatch } = useStateContext();
+  const { state, dispatch } = useStateContext();
 
   const quantityArray = ["0 (Delete)", 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]; // Array for quantity options
 
@@ -83,11 +87,16 @@ function CartItems(props: CartItemProps) {
         type: "REMOVE_FROM_CART",
         payload: { name: props.product.name },
       });
+      removeCartItemFromFirestore(state.user, props.product);
     } else {
       // Update the item quantity in the cart
       dispatch({
         type: "UPDATE_QUANTITY",
         payload: { name: props.product.name, quantity: Number(quantity) },
+      });
+      updateCartItemInFirestore(state.user, {
+        ...props.product,
+        quantity: Number(quantity),
       });
     }
     setIsOpen(false); // Close dropdown after selection
@@ -185,6 +194,7 @@ function CartItems(props: CartItemProps) {
                   type: "REMOVE_FROM_CART",
                   payload: { name: props.product.name },
                 });
+                removeCartItemFromFirestore(state.user, props.product);
               }}
             >
               Delete
@@ -203,6 +213,7 @@ function CartItems(props: CartItemProps) {
                     Style: props.product.Style,
                     monthlySalesCount: props.product.monthlySalesCount,
                     Size: props.product.Size,
+                    shippingCharge: props.product.shippingCharge,
                   },
                 });
               }}
