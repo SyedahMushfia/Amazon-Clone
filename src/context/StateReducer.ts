@@ -1,9 +1,14 @@
 import { CartState, CartAction, CartItem } from "../interfaces";
+import {
+  removeCartItemFromFirestore,
+  updateSavedItemsInFirestore,
+} from "../utils";
 
 // Initial state for the cart and saved items
 export const initialState: CartState = {
   cart: [],
   savedItems: [],
+  user: null,
 };
 
 // Function to calculate the total price of the items in the cart
@@ -67,6 +72,9 @@ export const reducer = (state: CartState, action: CartAction): CartState => {
         (item) => item.name === action.payload.name
       );
       if (savedItem) {
+        updateSavedItemsInFirestore(state.user, savedItem);
+        removeCartItemFromFirestore(state.user, savedItem);
+
         // If the item is found, move it from cart to saved items
         return {
           ...state,
@@ -82,6 +90,26 @@ export const reducer = (state: CartState, action: CartAction): CartState => {
         savedItems: state.savedItems.filter(
           (item) => item.name !== action.payload.name
         ),
+      };
+    }
+    case "LOAD_CART": {
+      return {
+        ...state,
+        cart: action.payload,
+      };
+    }
+    case "LOAD_SAVED_ITEMS": {
+      return {
+        ...state,
+        savedItems: action.payload,
+      };
+    }
+    case "SET_USER": {
+      return {
+        ...state,
+        user: action.payload,
+        cart: [],
+        savedItems: [],
       };
     }
     default:
